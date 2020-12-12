@@ -4,13 +4,10 @@ import Card from './Card';
 
 function ColorRange(from, to, current) {
   if (current >= from && to >= current) {
-    console.log('normal');
     return '#C3F584';
   } else if (current < from) {
-    console.log('low');
     return '#FCCA4A';
   } else if (current > to) {
-    console.log('high');
     return '#FF3D00';
   } else {
     return '#6DE15A';
@@ -18,13 +15,11 @@ function ColorRange(from, to, current) {
 }
 function Status(from, to, current) {
   if (current >= from && to >= current) {
-    console.log('normal');
     return 'Normal';
   } else if (current < from) {
     console.log('low');
     return 'Low';
   } else if (current > to) {
-    console.log('high');
     return 'High';
   } else {
     return 'Normal';
@@ -32,7 +27,7 @@ function Status(from, to, current) {
 }
 
 export function VitalSignsCard(props) {
-  const {name, symbols, from, to, currnet} = props;
+  const {name, symbols, from, to, currnet,samllSymbols} = props;
   let color = ColorRange(from, to, currnet);
   console.log(color);
   return (
@@ -43,7 +38,12 @@ export function VitalSignsCard(props) {
             {currnet}
           </Text>
         </View>
+        {!!symbols && 
         <Text style={styles.Sings}>{symbols}</Text>
+        }
+        {!!samllSymbols && 
+        <Text style={styles.samllSymbols}>{samllSymbols}</Text>
+        }
         <View style={styles.status}>
           <Text style={[styles.textCenter, styles.text]}>{name}</Text>
           <Text style={[styles.textCenter, styles.text, {color: color}]}>
@@ -103,6 +103,13 @@ const styles = StyleSheet.create({
   },
   Sings: {
     fontSize: 43,
+    fontWeight: 'bold',
+    color: '#838487',
+    alignSelf: 'center',
+    paddingLeft: 5,
+  },
+  samllSymbols: {
+    fontSize: 25,
     fontWeight: 'bold',
     color: '#838487',
     alignSelf: 'center',
