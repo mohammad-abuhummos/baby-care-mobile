@@ -9,6 +9,9 @@ import React from 'react';
 import {StyleSheet, Text, View ,Image} from 'react-native';
 import WelcomeScreen from './screens/WelcomeScreen';
 import Placeholder from './screens/Placeholder';
+import SignIn from './screens/Auth/SignIn';
+import SignUp from './screens/Auth/SignUp';
+import CompleteSignUp from './screens/Auth/CompleteSignUp';
 import {NavigationContainer, DrawerItems} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {
@@ -60,8 +63,10 @@ export default function App() {
         screenOptions={{
           headerShown: false,
         }}
-        initialRouteName="Home">
-        <Stack.Screen name="Home" component={AppDrawer} />
+        initialRouteName="SignIn">
+        <Stack.Screen name="SignIn" component={SignIn} />
+        <Stack.Screen name="SignUp" component={SignUp} />
+        <Stack.Screen name="CompleteSignUp" component={CompleteSignUp} />
       </Stack.Navigator>
     </NavigationContainer>
   );
