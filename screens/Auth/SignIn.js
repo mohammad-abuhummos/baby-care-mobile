@@ -12,8 +12,11 @@ import AppInput from '../../components/AppInput';
 import UserSignIn from '../../models/UserSignIn';
 import {displayError} from '../../models/helpers';
 import {Alert} from 'react-native';
+import auth from '@react-native-firebase/auth';
+import LoadingIndicator from '../../components/LoadingIndicator';
 
-export default function SignInScreen({ navigation }) {
+export default function SignInScreen({navigation}) {
+  const [loading, setLoading] = React.useState(false);
   const [Email, setEmail] = React.useState();
   const [Password, setPassword] = React.useState();
   const input = {
@@ -21,64 +24,88 @@ export default function SignInScreen({ navigation }) {
     password: Password,
   };
   const validate = (email, password) => {
+    setLoading(true);
     let sign_in_info = new UserSignIn(email, password);
     if (sign_in_info.isValid()) {
-      Alert.alert('valde');
+      auth()
+        .signInWithEmailAndPassword(email, password)
+        .then(() => {
+          setLoading(false);
+          navigation.navigate('Home');
+          console.log('User account created & signed in!');
+        })
+        .catch((error) => {
+          setLoading(false);
+          if (error.code === 'auth/invalid-email') {
+            Alert.alert('that email address is invalid!');
+          }
+          console.log(error);
+        });
     } else {
+      setLoading(false);
       console.log(sign_in_info.errors());
       displayError('Invalid Information', sign_in_info.errors().join(', '));
     }
   };
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <View
-          style={{
-            borderBottomColor: '#EE979F',
-            borderLeftColor: '#EE979F',
-            borderRightColor: '#EE979F',
-            borderTopWidth: 0,
-            borderRightWidth: 0,
-            borderLeftWidth: 0,
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderWidth: 10,
-          }}>
-          <Text style={styles.HedaerPink}>Sign In</Text>
-        </View>
-        <View style={styles.InnerContainer}>
-          <View style={{paddingTop: 10}}>
-            <Image
-              source={require('../../assets/logo.png')}
-              style={{
-                width: 180,
-                height: 180,
-                resizeMode: 'center',
-                aspectRatio: 1 / 2,
-              }}
-            />
+  if (loading) {
+    return <LoadingIndicator />
+  } else {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ScrollView>
+          <View
+            style={{
+              borderBottomColor: '#EE979F',
+              borderLeftColor: '#EE979F',
+              borderRightColor: '#EE979F',
+              borderTopWidth: 0,
+              borderRightWidth: 0,
+              borderLeftWidth: 0,
+              justifyContent: 'center',
+              alignItems: 'center',
+              borderWidth: 10,
+            }}>
+            <Text style={styles.HedaerPink}>Sign In</Text>
           </View>
-          <View style={{paddingTop: 30}}>
-            <AppInput label="Email" onChangeText={(text) => setEmail(text)} />
+          <View style={styles.InnerContainer}>
+            <View style={{paddingTop: 10}}>
+              <Image
+                source={require('../../assets/logo.png')}
+                style={{
+                  width: 180,
+                  height: 180,
+                  resizeMode: 'center',
+                  aspectRatio: 1 / 2,
+                }}
+              />
+            </View>
+            <View style={{paddingTop: 30}}>
+              <AppInput label="Email" onChangeText={(text) => setEmail(text)} />
+            </View>
+            <View style={{paddingTop: 30}}>
+              <AppInput
+                label="Password"
+                onChangeText={(text) => setPassword(text)}
+                secureTextEntry={true}
+              />
+            </View>
+            <View style={{paddingTop: 30}}>
+              <Button
+                title="Sign in"
+                onPress={() => validate(Email, Password)}
+              />
+            </View>
+            <View style={{paddingTop: 30}}>
+              <Button
+                title="Sign up"
+                onPress={() => navigation.navigate('SignUp')}
+              />
+            </View>
           </View>
-          <View style={{paddingTop: 30}}>
-            <AppInput
-              label="Password"
-              onChangeText={(text) => setPassword(text)}
-              secureTextEntry={true}
-            />
-          </View>
-          <View style={{paddingTop: 30}}>
-            <Button title="Sign in" onPress={() => validate(Email, Password)} />
-          </View>
-          <View style={{paddingTop: 30}}>
-            <Button title="Sign up" onPress={() => navigation.navigate('SignUp')}  />
-          </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
