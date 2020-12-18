@@ -6,19 +6,31 @@ import {
   Image,
   SafeAreaView,
   ScrollView,
+  Alert,
 } from 'react-native';
 import Button from '../../components/Button';
 import AppInput from '../../components/AppInput';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import UserSignUp from '../../models/UserSignUp';
+import { displayError } from '../../models/helpers';
 
 export default function SignUpScreen({navigation}) {
-  const [firstname, setFirstname] = React.useState('');
-  const [lastname, setLastname] = React.useState('');
-  const [phone, setPhone] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [passwordConfirmation, setPasswordConfirmation] = React.useState('');
   const input = {
-    firstname: firstname,
-    lastname: lastname,
-    phone: phone,
+    email: email,
+    password: password,
+    passwordConfirmation: passwordConfirmation,
+  };
+  const validate = (email, password, passwordConfirmation) => {
+    let sign_up_info = new UserSignUp(email, password, passwordConfirmation);
+    if (sign_up_info.isValid()) {
+      Alert.alert('valde');
+    } else {
+      console.log(sign_up_info.errors());
+      displayError('Invalid Information', sign_up_info.errors().join(', '));
+    }
   };
   return (
     <SafeAreaView style={styles.container}>
@@ -51,33 +63,26 @@ export default function SignUpScreen({navigation}) {
             />
           </View>
           <View style={{paddingTop: 30}}>
+            <AppInput label="Email" onChangeText={(text) => setEmail(text)} />
+          </View>
+          <View style={{paddingTop: 30}}>
             <AppInput
-              label="First name"
-              onChangeText={(text) => setFirstname(text)}
+              label="Password"
+              onChangeText={(text) => setPassword(text)}
+              secureTextEntry={true}
             />
           </View>
           <View style={{paddingTop: 30}}>
             <AppInput
-              label="Last name"
-              onChangeText={(text) => setLastname(text)}
-            />
-          </View>
-          <View style={{paddingTop: 30}}>
-            <AppInput
-              label="Phone number"
-              onChangeText={(text) => setPhone(text)}
+              label="Retype password"
+              onChangeText={(text) => setPasswordConfirmation(text)}
+              secureTextEntry={true}
             />
           </View>
           <View style={{paddingTop: 30}}>
             <Button
               title="Next"
-              onPress={() => {
-                navigation.navigate('CompleteSignUp', {
-                  firstname: firstname,
-                  lastname: lastname,
-                  phone: phone,
-                });
-              }}
+              onPress={() => validate(email, password, passwordConfirmation)}
             />
           </View>
         </View>
