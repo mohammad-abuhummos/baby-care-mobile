@@ -55,11 +55,11 @@ function AppDrawer() {
     </Drawer.Navigator>
   );
 }
-
+export const UserContext = React.createContext();
 export default function App() {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState();
-  console.log(user);
+  console.log('user', user);
   function onAuthStateChanged(user) {
     setUser(user);
     if (initializing) setInitializing(false);
@@ -69,28 +69,37 @@ export default function App() {
     return subscriber; // unsubscribe on unmount
   }, []);
   console.log('initializing ', initializing);
-  console.log('user ', !!user);
+
   const Stack = createStackNavigator();
+  let authContext = 'null';
+  if (!!user && !initializing) {
+    authContext = user._user.uid;
+  }
+  console.log('authContextAPp', authContext);
   return (
-    <NavigationContainer>
-      <View>
-        {!!user && !initializing ? (
-          <Text>Welcome{user._user.email}</Text>
-        ) : (
-          <Text>Login</Text>
-        )}
-      </View>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-        }}
-        initialRouteName="SignIn">
-        <Stack.Screen name="SignIn" component={SignIn} />
-        <Stack.Screen name="SignUp" component={SignUp} />
-        <Stack.Screen name="CompleteSignUp" component={CompleteSignUp} />
-        <Stack.Screen name="Home" component={AppDrawer} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <UserContext.Provider value={authContext}>
+      <NavigationContainer>
+        <View>
+          {!!user && !initializing ? (
+            <Text>
+              Welcome{user._user.email} + {authContext}
+            </Text>
+          ) : (
+            <Text>Login</Text>
+          )}
+        </View>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+          }}
+          initialRouteName="SignIn">
+          <Stack.Screen name="SignIn" component={SignIn} />
+          <Stack.Screen name="SignUp" component={SignUp} />
+          <Stack.Screen name="CompleteSignUp" component={CompleteSignUp} />
+          <Stack.Screen name="Home" component={AppDrawer} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </UserContext.Provider>
   );
 }
 
