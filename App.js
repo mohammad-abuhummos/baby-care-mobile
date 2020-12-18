@@ -5,8 +5,8 @@
  * @format
  * @flow strict-local
  */
-import React from 'react';
-import {StyleSheet, Text, View ,Image} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {StyleSheet, Text, View, Image} from 'react-native';
 import WelcomeScreen from './screens/WelcomeScreen';
 import Placeholder from './screens/Placeholder';
 import SignIn from './screens/Auth/SignIn';
@@ -19,6 +19,7 @@ import {
   DrawerItemList,
   DrawerItem,
 } from '@react-navigation/drawer';
+import auth from '@react-native-firebase/auth';
 
 const Drawer = createDrawerNavigator();
 function CustomDrawerContentComponent(props) {
@@ -44,10 +45,10 @@ function CustomDrawerContentComponent(props) {
 function AppDrawer() {
   return (
     <Drawer.Navigator
-    drawerStyle={{
-      backgroundColor: 'rgba(238, 151, 159, 0.8)',
-      width: 240,
-    }}
+      drawerStyle={{
+        backgroundColor: 'rgba(238, 151, 159, 0.8)',
+        width: 240,
+      }}
       initialRouteName="Placeholder"
       drawerContent={(props) => <CustomDrawerContentComponent {...props} />}>
       <Drawer.Screen name="Placeholder" component={Placeholder} />
@@ -56,9 +57,29 @@ function AppDrawer() {
 }
 
 export default function App() {
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState();
+  console.log(user);
+  function onAuthStateChanged(user) {
+    setUser(user);
+    if (initializing) setInitializing(false);
+  }
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber; // unsubscribe on unmount
+  }, []);
+  console.log('initializing ', initializing);
+  console.log('user ', !!user);
   const Stack = createStackNavigator();
   return (
     <NavigationContainer>
+      <View>
+        {!!user && !initializing ? (
+          <Text>Welcome{user._user.email}</Text>
+        ) : (
+          <Text>Login</Text>
+        )}
+      </View>
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
@@ -67,6 +88,7 @@ export default function App() {
         <Stack.Screen name="SignIn" component={SignIn} />
         <Stack.Screen name="SignUp" component={SignUp} />
         <Stack.Screen name="CompleteSignUp" component={CompleteSignUp} />
+        <Stack.Screen name="Home" component={AppDrawer} />
       </Stack.Navigator>
     </NavigationContainer>
   );

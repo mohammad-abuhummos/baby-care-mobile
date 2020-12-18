@@ -28,23 +28,23 @@ export default function Placeholder() {
         alignItems: 'center',
       }}>
       {/* <BabyInfoCard color="#fff" /> */}
-      <View >
+      <View>
         <VitalSignsCard
           samllSymbols={'bpm'}
           name="Heart rate"
           from={60}
           to={120}
-          currnet={Math.ceil(currnet.Ritmo_cardiaco)}
+          currnet={!!currnet ? Math.ceil(currnet.Ritmo_cardiaco) : 0}
           color="#fff"
         />
       </View>
-      <View style={{paddingTop:10}}>
+      <View style={{paddingTop: 10}}>
         <VitalSignsCard
           symbols={'%'}
           name="Oxygen level"
           from={50}
           to={120}
-          currnet={Math.ceil(currnet.SpO2)}
+          currnet={!!currnet ? Math.ceil(currnet.SpO2) : 0}
           color="#fff"
         />
       </View>
