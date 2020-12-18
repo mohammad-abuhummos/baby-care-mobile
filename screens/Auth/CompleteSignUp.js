@@ -12,13 +12,13 @@ import Button from '../../components/Button';
 import AppInput from '../../components/AppInput';
 
 export default function CompleteSignUpScreen({navigation}) {
-  const [email, setEmail] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [retypePassword, setRetypePassword] = React.useState('');
+  const [firstname, setFirstname] = React.useState('');
+  const [lastname, setLastname] = React.useState('');
+  const [phone, setPhone] = React.useState('');
   const input = {
-    email: email,
-    password: password,
-    retypePassword: retypePassword,
+    firstname: firstname,
+    lastname: lastname,
+    phone: phone,
   };
   const validate = (email, password) => {
     let user_account = new UserAccount(
@@ -65,22 +65,23 @@ export default function CompleteSignUpScreen({navigation}) {
           />
         </View>
         <View style={{paddingTop: 30}}>
-          <AppInput label="Email" onChangeText={(text) => setEmail(text)} />
-        </View>
-        <View style={{paddingTop: 30}}>
-          <AppInput
-            label="Password"
-            onChangeText={(text) => setPassword(text)}
-            secureTextEntry={true}
-          />
-        </View>
-        <View style={{paddingTop: 30}}>
-          <AppInput
-            label="Retype password"
-            onChangeText={(text) => setRetypePassword(text)}
-            secureTextEntry={true}
-          />
-        </View>
+            <AppInput
+              label="First name"
+              onChangeText={(text) => setFirstname(text)}
+            />
+          </View>
+          <View style={{paddingTop: 30}}>
+            <AppInput
+              label="Last name"
+              onChangeText={(text) => setLastname(text)}
+            />
+          </View>
+          <View style={{paddingTop: 30}}>
+            <AppInput
+              label="Phone number"
+              onChangeText={(text) => setPhone(text)}
+            />
+          </View>
         <View style={{paddingTop: 30}}>
           <Button title="Finsh" />
         </View>

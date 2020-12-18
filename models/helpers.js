@@ -15,6 +15,10 @@ export function isPresent(val) {
   export function isMatching(val_1, val_2) {
     return isPresent(val_1) && isPresent(val_2) && val_1 === val_2;
   }
+
+  export function isPasword(val_1) {
+    return isPresent(val_1) && val_1 > 3;
+  }
   
 
   export function collectionRequestObjects(collection) {
