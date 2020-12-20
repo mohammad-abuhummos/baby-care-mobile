@@ -7,7 +7,7 @@
  */
 import React, {useState, useEffect} from 'react';
 import {StyleSheet, Text, View, Image} from 'react-native';
-import WelcomeScreen from './screens/WelcomeScreen';
+// import WelcomeScreen from './screens/WelcomeScreen';
 import Placeholder from './screens/Placeholder';
 import SignIn from './screens/Auth/SignIn';
 import SignUp from './screens/Auth/SignUp';
@@ -20,6 +20,7 @@ import {
   DrawerItem,
 } from '@react-navigation/drawer';
 import auth from '@react-native-firebase/auth';
+import CreateBabyAccount from './screens/Auth/CreateBabyAccount';
 
 const Drawer = createDrawerNavigator();
 function CustomDrawerContentComponent(props) {
@@ -80,7 +81,7 @@ export default function App() {
     <UserContext.Provider value={authContext}>
       <NavigationContainer>
         <View>
-          {!!user && !initializing ? (
+          {!!user ? (
             <Text>
               Welcome{user._user.email} + {authContext}
             </Text>
@@ -97,6 +98,10 @@ export default function App() {
           <Stack.Screen name="SignUp" component={SignUp} />
           <Stack.Screen name="CompleteSignUp" component={CompleteSignUp} />
           <Stack.Screen name="Home" component={AppDrawer} />
+          <Stack.Screen
+            name="CreateBabyAccount"
+            component={CreateBabyAccount}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </UserContext.Provider>

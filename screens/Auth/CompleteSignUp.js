@@ -32,7 +32,7 @@ export default function CompleteSignUpScreen({navigation}) {
       database()
         .ref(`/users/${id}`)
         .set({info})
-        .then(() => console.log('Data set.'));
+        .then(() => navigation.navigate('CreateBabyAccount'));
     } else {
       setLoading(false);
       console.log(User_info.errors());
