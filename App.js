@@ -21,6 +21,7 @@ import {
 } from '@react-navigation/drawer';
 import auth from '@react-native-firebase/auth';
 import CreateBabyAccount from './screens/Auth/CreateBabyAccount';
+import Home from './screens/Home';
 
 const Drawer = createDrawerNavigator();
 function CustomDrawerContentComponent(props) {
@@ -52,7 +53,20 @@ function AppDrawer() {
       }}
       initialRouteName="Placeholder"
       drawerContent={(props) => <CustomDrawerContentComponent {...props} />}>
-      <Drawer.Screen name="Placeholder" component={Placeholder} />
+      <Drawer.Screen
+        name="Home"
+        options={{
+          title: 'Home',
+          headerStyle: {
+            backgroundColor: '#EE979F',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}
+        component={Home}
+      />
     </Drawer.Navigator>
   );
 }
@@ -93,7 +107,7 @@ export default function App() {
           screenOptions={{
             headerShown: false,
           }}
-          initialRouteName="SignIn">
+          initialRouteName="Home">
           <Stack.Screen name="SignIn" component={SignIn} />
           <Stack.Screen name="SignUp" component={SignUp} />
           <Stack.Screen name="CompleteSignUp" component={CompleteSignUp} />
