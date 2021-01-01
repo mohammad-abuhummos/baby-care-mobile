@@ -16,27 +16,7 @@ import LoadingIndicator from '../components/LoadingIndicator';
 export default function UserProfile({navigation}) {
   const {user} = React.useContext(UserContext);
   const [loading, setLoading] = React.useState(true);
-  const currentDate = () => {
-    return new Date().toJSON().slice(0, 10).replace(/-/g, '-');
-  };
   const [userProfile, setuserProfile] = React.useState();
-  const [gender, setGender] = React.useState('Female');
-  const data = [
-    {
-      label: 'Female',
-    },
-    {
-      label: 'Male',
-    },
-  ];
-  const CalculateAge = (birthday) => {
-    if (!!birthday) {
-      const today = currentDate().split('-');
-      const date = birthday.split('-');
-      return today[0] - date[0];
-    }
-  };
-
   React.useEffect(() => {
     const onValueChange = database()
       .ref(`/users/${user._user.uid}/info`)
@@ -93,7 +73,7 @@ export default function UserProfile({navigation}) {
           <View style={{paddingTop: 50, paddingHorizontal: 50}}>
             <Button
               title="Edit"
-              onPress={() => navigation.navigate('EditBabyinfo')}
+              onPress={() => navigation.navigate('EditUserProfile')}
             />
           </View>
         </View>

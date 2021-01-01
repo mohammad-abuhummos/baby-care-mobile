@@ -26,31 +26,64 @@ import BabyProfile from './screens/BabyProfile';
 import EditBabyinfo from './screens/EditBabyinfo';
 import LoadingIndicator from './components/LoadingIndicator';
 import UserProfile from './screens/UserProfile';
+import EditUserProfile from './screens/EditUserProfile';
 
 export const UserContext = React.createContext();
 export default function App() {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState(null);
   const signOut = () => {
+    setInitializing(true);
     auth()
       .signOut()
       .then(() => setUser(null));
   };
   const Drawer = createDrawerNavigator();
+  const ProfileStack = createStackNavigator();
+
+  function Profile() {
+    return (
+      <>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+          }}>
+          <ProfileStack.Screen
+            name="ProfileInfo"
+            options={{
+              title: 'Profile',
+              headerStyle: {
+                backgroundColor: '#EE979F',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+            component={UserProfile}
+          />
+          <Stack.Screen
+            name="EditUserProfile"
+            options={{
+              title: 'Edit Profile',
+              headerStyle: {
+                backgroundColor: '#EE979F',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
+            component={EditUserProfile}
+          />
+        </Stack.Navigator>
+      </>
+    );
+  }
+
   function CustomDrawerContentComponent(props) {
     return (
       <View style={{paddingVertical: 60}}>
-        <View style={{padding: 20}}>
-          <Image
-            source={require('./assets/baby.jpeg')}
-            style={{width: 100, height: 100, borderRadius: 50}}
-          />
-          <Text style={{fontSize: 20, fontWeight: 'bold', paddingLeft: 15}}>
-            kdcnjdn
-          </Text>
-          <Text style={{paddingLeft: 15}}>Bela@gmail.com</Text>
-        </View>
-
         <DrawerItemList {...props} />
         <DrawerItem label="Sign Out" onPress={() => signOut()} />
       </View>
@@ -94,21 +127,6 @@ export default function App() {
           }}
           component={BabyProfile}
         />
-
-        <Drawer.Screen
-          name="EditBabyinfo"
-          options={{
-            title: 'Edit Baby info',
-            headerStyle: {
-              backgroundColor: '#EE979F',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }}
-          component={EditBabyinfo}
-        />
         <Drawer.Screen
           name="UserProfile"
           options={{
@@ -121,7 +139,7 @@ export default function App() {
               fontWeight: 'bold',
             },
           }}
-          component={UserProfile}
+          component={Profile}
         />
       </Drawer.Navigator>
     );
@@ -170,6 +188,16 @@ export default function App() {
                 />
                 <Stack.Screen
                   name="CompleteSignUp"
+                  options={{
+                    title: 'Edit Profile',
+                    headerStyle: {
+                      backgroundColor: '#EE979F',
+                    },
+                    headerTintColor: '#fff',
+                    headerTitleStyle: {
+                      fontWeight: 'bold',
+                    },
+                  }}
                   component={CompleteSignUp}
                 />
               </>
