@@ -2,7 +2,7 @@ import React from "react";
 import { StyleSheet, Text, View, TextInput } from "react-native";
 
 export default function AppInput(props) {
-  const { label, placeholder } = props;
+  const { label, placeholder,value } = props;
   return (
     <View style={styles.Inputcontainer}>
       <View
@@ -51,6 +51,7 @@ export default function AppInput(props) {
               borderWidth: 1,
               padding: 5,
             }}
+            value={value}
             placeholder={placeholder}
             {...props}
           />

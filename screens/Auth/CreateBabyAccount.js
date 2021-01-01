@@ -15,8 +15,7 @@ import database from '@react-native-firebase/database';
 import DatePicker from 'react-native-datepicker';
 import RadioButtonRN from 'radio-buttons-react-native';
 export default function CreateBabyAccount({navigation}) {
-  const id = React.useContext(UserContext);
-  console.log('authContext', id);
+  const {user} = React.useContext(UserContext);
   const [loading, setLoading] = React.useState(false);
   const currentDate = () => {
     return new Date().toJSON().slice(0, 10).replace(/-/g, '-');
@@ -29,12 +28,12 @@ export default function CreateBabyAccount({navigation}) {
     const babyInfo = {
       name: name,
       date: date,
-      Phone: gender,
+      gender: gender,
     };
     database()
-      .ref(`/users/${id}/baby`)
+      .ref(`/users/${user._user.uid}/baby`)
       .set({babyInfo})
-      .then(() => console.log('Data set.'));
+      .then(() =>  navigation.navigate('Home'));
   };
   const data = [
     {
