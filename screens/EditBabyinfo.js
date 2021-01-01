@@ -6,6 +6,7 @@ import {
   Image,
   SafeAreaView,
   ScrollView,
+  Alert,
 } from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import Button from '../components/Button';
@@ -15,9 +16,14 @@ import {UserContext} from '../App';
 import database from '@react-native-firebase/database';
 import DatePicker from 'react-native-datepicker';
 import RadioButtonRN from 'radio-buttons-react-native';
+import ImagePicker from 'react-native-image-crop-picker';
+import storage from '@react-native-firebase/storage';
+
 export default function EditBabyinfo({navigation}) {
   const [currntBaby, setCurrntBaby] = React.useState();
   const {user, setIsLoading} = React.useContext(UserContext);
+  const [image, setImage] = React.useState(null);
+  const [uploading, setUploading] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
   const currentDate = () => {
     return new Date().toJSON().slice(0, 10).replace(/-/g, '-');
@@ -31,7 +37,6 @@ export default function EditBabyinfo({navigation}) {
     setLoading(false);
     return () => database().ref(`/Data`).off('value', onValueChange);
   }, [currntBaby]);
-  const [image, setImage] = React.useState(null);
   const [name, setName] = React.useState('');
   const [date, setDate] = React.useState(
     !!currntBaby ? currntBaby.date : '2016-10-10',
@@ -62,8 +67,37 @@ export default function EditBabyinfo({navigation}) {
     },
   ];
 
-  const pickImage = () => {};
-  if (!!loading) {
+  const pickImage = () => {
+    ImagePicker.openPicker({
+      width: 300,
+      height: 400,
+      cropping: true,
+    }).then((image) => {
+      console.log('image =>', image);
+      let {path} = image;
+      setImage(path);
+      uploadImage(path);
+    });
+  };
+
+  const uploadImage = async (uri) => {
+    const fileKey = user.uid;
+    const uploadUri = uri;
+    setUploading(true);
+    const task = storage().ref(fileKey).putFile(uploadUri);
+    try {
+      await task;
+    } catch (e) {
+      console.error(e);
+    }
+    setUploading(false);
+    Alert.alert(
+      'Photo uploaded!',
+      'Your photo has been uploaded to Firebase Cloud Storage!',
+    );
+  };
+
+  if (!!loading || uploading) {
     return <LoadingIndicator />;
   } else {
     return (
@@ -75,7 +109,7 @@ export default function EditBabyinfo({navigation}) {
                 <Image
                   source={
                     !!image
-                      ? {uri: image.uri}
+                      ? {uri: image}
                       : require('../assets/add-image-icon.png')
                   }
                   style={{
