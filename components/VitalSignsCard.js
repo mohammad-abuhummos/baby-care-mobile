@@ -17,7 +17,7 @@ function Status(from, to, current) {
   if (current >= from && to >= current) {
     return 'Normal';
   } else if (current < from) {
-    console.log('low');
+    // console.log('low');
     return 'Low';
   } else if (current > to) {
     return 'High';
@@ -29,7 +29,6 @@ function Status(from, to, current) {
 export function VitalSignsCard(props) {
   const {name, symbols, from, to, currnet,samllSymbols} = props;
   let color = ColorRange(from, to, currnet);
-  console.log(color);
   return (
     <Card>
       <View style={styles.container}>

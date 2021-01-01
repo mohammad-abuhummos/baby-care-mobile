@@ -6,13 +6,12 @@ import database from '@react-native-firebase/database';
 import {UserContext} from '../App';
 import {Image} from 'react-native';
 export default function Home() {
-  const id = React.useContext(UserContext);
+  const {authContext,user} = React.useContext(UserContext);
   const [currnetSign, setCurrnetSign] = React.useState(0);
   const [currnetBaby, setCurrnetBaby] = React.useState();
   const [DialogVal, setDialogVal] = React.useState({visible: false});
 
   React.useEffect(() => {
-    console.log('hi');
     const onValueChange = database()
       .ref(`/Data`)
       .on('value', (snapshot) => {
@@ -23,19 +22,21 @@ export default function Home() {
   }, []);
   React.useEffect(() => {
     const onValueChange = database()
-      .ref(`users/${id}/baby/babyInfo`)
+      .ref(`users/${authContext}/baby/babyInfo`)
       .on('value', (snapshot) => {
         setCurrnetBaby(snapshot.val());
       });
 
     return () =>
-      database().ref(`users/${id}/baby/babyInfo`).off('value', onValueChange);
+      database().ref(`users/${authContext}/baby/babyInfo`).off('value', onValueChange);
   }, []);
   React.useEffect(() => {
-    if ((!!currnetSign && currnetSign.bpm === 0) || currnetSign.SpO2 === 0) {
-      setDialogVal({visible: true});
-    } else {
-      setDialogVal({visible: false});
+    if (!!user) {      
+      if ((!!currnetSign && currnetSign.bpm === 0) || currnetSign.SpO2 === 0) {
+        setDialogVal({visible: true});
+      } else {
+        setDialogVal({visible: false});
+      }
     }
   }, [currnetSign]);
   return (

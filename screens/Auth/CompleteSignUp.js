@@ -15,8 +15,7 @@ import {displayError} from '../../models/helpers';
 import CompleteSignUp from '../../models/CompleteSignUp';
 import database from '@react-native-firebase/database';
 export default function CompleteSignUpScreen({navigation}) {
-  const id = React.useContext(UserContext);
-  console.log('authContext', id);
+  const { user } = React.useContext(UserContext);
   const [loading, setLoading] = React.useState(false);
   const [firstname, setFirstname] = React.useState('');
   const [lastname, setLastname] = React.useState('');
@@ -28,9 +27,10 @@ export default function CompleteSignUpScreen({navigation}) {
         Firstname: firstname,
         Lastname: lastname,
         Phone: phone,
+        Email:user._user.email,
       };
       database()
-        .ref(`/users/${id}`)
+        .ref(`/users/${user._user.uid}`)
         .set({info})
         .then(() => navigation.navigate('CreateBabyAccount'));
     } else {

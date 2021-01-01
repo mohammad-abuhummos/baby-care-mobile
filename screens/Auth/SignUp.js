@@ -120,7 +120,7 @@ export default function SignUpScreen({navigation}) {
               />
             </View>
             <View style={{paddingTop: 30}}>
-               <Button title="sign out" onPress={() => SignOutUser()} />
+              <Button title="sign out" onPress={() => SignOutUser()} />
             </View>
           </View>
         </ScrollView>
