@@ -21,6 +21,7 @@
     "radio-buttons-react-native": "^1.0.4",
     "react": "16.13.1",
     "react-native": "0.63.3",
+    "react-native-chart-kit": "^6.9.0",
     "react-native-datepicker": "^1.7.2",
     "react-native-elements": "^3.0.0-alpha.1",
     "react-native-gesture-handler": "^1.8.0",
@@ -29,6 +30,7 @@
     "react-native-reanimated": "^1.13.1",
     "react-native-safe-area-context": "^3.1.9",
     "react-native-screens": "^2.14.0",
+    "react-native-svg": "^12.1.0",
     "react-native-vector-icons": "^7.1.0"
   },
   "devDependencies": {
