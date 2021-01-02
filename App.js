@@ -5,6 +5,7 @@
  * @format
  * @flow strict-local
  */
+import 'react-native-gesture-handler';
 import React, {useState, useEffect} from 'react';
 import {StyleSheet, Text, View, Image} from 'react-native';
 // import WelcomeScreen from './screens/WelcomeScreen';
@@ -93,6 +94,7 @@ export default function App() {
   function AppDrawer() {
     return (
       <Drawer.Navigator
+        screenOptions={{headerShown: true}}
         drawerStyle={{
           backgroundColor: 'rgba(238, 151, 159, 0.8)',
           width: 240,
@@ -159,7 +161,6 @@ export default function App() {
     user,
     setInitializing,
   };
-  console.log('authContextAPp', user);
   if (initializing) {
     return <LoadingIndicator />;
   } else {
