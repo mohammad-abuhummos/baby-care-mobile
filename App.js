@@ -29,7 +29,6 @@ import LoadingIndicator from './components/LoadingIndicator';
 import UserProfile from './screens/UserProfile';
 import EditUserProfile from './screens/EditUserProfile';
 import Statistics from './screens/Statistics';
-import ConnectToNodemcu from './screens/ConnectToNodemcu';
 
 
 
@@ -162,9 +161,9 @@ export default function App() {
           component={Profile}
         />
         <Drawer.Screen
-          name="ConnectToNodemcu"
+          name="EditBabyinfo"
           options={{
-            title: 'Nodemcu',
+            title: 'EditBabyinfo',
             headerStyle: {
               backgroundColor: '#EE979F',
             },
@@ -173,7 +172,7 @@ export default function App() {
               fontWeight: 'bold',
             },
           }}
-          component={ConnectToNodemcu}
+          component={EditBabyinfo}
         />
       </Drawer.Navigator>
     );
