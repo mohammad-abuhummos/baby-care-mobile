@@ -28,6 +28,10 @@ import EditBabyinfo from './screens/EditBabyinfo';
 import LoadingIndicator from './components/LoadingIndicator';
 import UserProfile from './screens/UserProfile';
 import EditUserProfile from './screens/EditUserProfile';
+import Statistics from './screens/Statistics';
+import ConnectToNodemcu from './screens/ConnectToNodemcu';
+
+
 
 export const UserContext = React.createContext();
 export default function App() {
@@ -116,6 +120,20 @@ export default function App() {
           component={Home}
         />
         <Drawer.Screen
+          name="Statistics"
+          options={{
+            title: 'Statistics',
+            headerStyle: {
+              backgroundColor: '#EE979F',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }}
+          component={Statistics}
+        />
+        <Drawer.Screen
           name="BabyProfile"
           options={{
             title: 'Baby Profile',
@@ -142,6 +160,20 @@ export default function App() {
             },
           }}
           component={Profile}
+        />
+        <Drawer.Screen
+          name="ConnectToNodemcu"
+          options={{
+            title: 'Nodemcu',
+            headerStyle: {
+              backgroundColor: '#EE979F',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }}
+          component={ConnectToNodemcu}
         />
       </Drawer.Navigator>
     );

@@ -18,34 +18,42 @@ const windowHeight = Dimensions.get('window').height;
 
 export default function EditUserProfile({navigation}) {
   const {user} = React.useContext(UserContext);
-  const [loading, setLoading] = React.useState(true);
-  React.useEffect(() => {
-    const onValueChange = database()
-    .ref(`/users/${user._user.uid}/info`)
-      .on('value', (snapshot) => {
-         const info = snapshot.val();
-         setFirstName(info.Firstname)
-         setLastName(info.Lastname)
-         setPhone(info.Phone)
-      });
-      setLoading(false);
-      return () => database().ref(`/Data`).off('value', onValueChange);
-    }, []);
+  const [loading, setLoading] = React.useState(false);
+  
+  // React.useEffect(() => {
+  //   const onValueChange = database()
+  //   .ref(`/users/${user._user.uid}/info`)
+  //     .on('value', (snapshot) => {
+  //        const info = snapshot.val();
+  //        setFirstName(info.Firstname)
+  //        setLastName(info.Lastname)
+  //        setPhone(info.Phone)
+  //     });
+  //     setLoading(false);
+  //     return () => database().ref(`/Data`).off('value', onValueChange);
+  //   }, []);
   const [firstName,  setFirstName] = React.useState("");
   const [lastName,  setLastName] = React.useState("");
   const [phone,  setPhone] = React.useState("");
-  const handleInfo = () => {
-    setLoading(true);
-    database()
-      .ref(`/users/${user._user.uid}/info`)
-      .update({  Firstname: firstName,
-        Lastname: lastName,
-        Phone: phone,
-        Email:user._user.email,})
-      .then(() => {
-        setLoading(false);
-        navigation.goBack();
-      });
+  const handleInfo = async() => {
+    let hi
+    try{
+       await database()
+        .ref(`/users/${user._user.uid}/info`)
+        .update({  Firstname: firstName,
+          Lastname: lastName,
+          Phone: phone,
+          Email:user._user.email,})
+        .then(res => {
+          setLoading(false);
+          console.log(res,res)
+          // navigation.goBack();
+        });
+      }
+      catch(err) {
+        console.log(err);
+      }
+      console.log("hiiiiiiiiiiiiiiiiiiii",hi);
   };
   if (!!loading) {
     return <LoadingIndicator />;
