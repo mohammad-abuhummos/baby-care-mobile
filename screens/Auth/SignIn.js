@@ -11,7 +11,6 @@ import Button from '../../components/Button';
 import AppInput from '../../components/AppInput';
 import UserSignIn from '../../models/UserSignIn';
 import {displayError} from '../../models/helpers';
-import {Alert} from 'react-native';
 import auth from '@react-native-firebase/auth';
 import LoadingIndicator from '../../components/LoadingIndicator';
 
@@ -30,15 +29,11 @@ export default function SignInScreen({navigation}) {
       auth()
         .signInWithEmailAndPassword(email, password)
         .then(() => {
-          setLoading(false);
-          navigation.navigate('Home');
           console.log('User account created & signed in!');
         })
         .catch((error) => {
           setLoading(false);
-          if (error.code === 'auth/invalid-email') {
-            Alert.alert('that email address is invalid!');
-          }
+          displayError('Invalid Information', "invalid email or password");
           console.log(error);
         });
     } else {

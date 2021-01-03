@@ -14,9 +14,13 @@ import {UserContext} from '../../App';
 import database from '@react-native-firebase/database';
 import DatePicker from 'react-native-datepicker';
 import RadioButtonRN from 'radio-buttons-react-native';
+import ImagePicker from 'react-native-image-crop-picker';
+import storage from '@react-native-firebase/storage';
+
 export default function CreateBabyAccount({navigation}) {
   const {user} = React.useContext(UserContext);
   const [loading, setLoading] = React.useState(false);
+  const [uploading, setUploading] = React.useState(false);
   const currentDate = () => {
     return new Date().toJSON().slice(0, 10).replace(/-/g, '-');
   };
@@ -25,6 +29,7 @@ export default function CreateBabyAccount({navigation}) {
   const [date, setDate] = React.useState('2016-05-15');
   const [gender, setGender] = React.useState('Female');
   const handleInfo = () => {
+    uploadImage(image);
     const babyInfo = {
       name: name,
       date: date,
@@ -33,7 +38,7 @@ export default function CreateBabyAccount({navigation}) {
     database()
       .ref(`/users/${user._user.uid}/baby`)
       .set({babyInfo})
-      .then(() =>  navigation.navigate('Home'));
+      .then(() => navigation.navigate('Home'));
   };
   const data = [
     {
@@ -44,7 +49,35 @@ export default function CreateBabyAccount({navigation}) {
     },
   ];
 
-  const pickImage = () => {};
+  const pickImage = () => {
+    ImagePicker.openPicker({
+      width: 300,
+      height: 400,
+      cropping: true,
+    }).then((image) => {
+      console.log('image =>', image);
+      let {path} = image;
+      setImage(path);
+    });
+  };
+
+  const uploadImage = async (uri) => {
+    const fileKey = user.uid;
+    const uploadUri = uri;
+    setUploading(true);
+    const task = storage().ref(fileKey).putFile(uploadUri);
+    try {
+      await task;
+    } catch (e) {
+      console.error(e);
+    }
+    setUploading(false);
+    Alert.alert(
+      'Photo uploaded!',
+      'Your photo has been uploaded to Firebase Cloud Storage!',
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -189,10 +222,7 @@ export default function CreateBabyAccount({navigation}) {
             </View>
           </View>
           <View style={{paddingTop: 30}}>
-            <Button
-              title="Finsh"
-              onPress={() => handleInfo()}
-            />
+            <Button title="Finsh" onPress={() => handleInfo()} />
           </View>
         </View>
       </ScrollView>
