@@ -13,48 +13,52 @@ import Button from '../components/Button';
 import AppInput from '../components/AppInput';
 import LoadingIndicator from '../components/LoadingIndicator';
 import {UserContext} from '../App';
-import database from '@react-native-firebase/database';
-const windowHeight = Dimensions.get('window').height;
+import database, {firebase} from '@react-native-firebase/database';
 
+const windowHeight = Dimensions.get('window').height;
 export default function EditUserProfile({navigation}) {
   const {user} = React.useContext(UserContext);
-  const [loading, setLoading] = React.useState(false);
-  
-  // React.useEffect(() => {
-  //   const onValueChange = database()
-  //   .ref(`/users/${user._user.uid}/info`)
-  //     .on('value', (snapshot) => {
-  //        const info = snapshot.val();
-  //        setFirstName(info.Firstname)
-  //        setLastName(info.Lastname)
-  //        setPhone(info.Phone)
-  //     });
-  //     setLoading(false);
-  //     return () => database().ref(`/Data`).off('value', onValueChange);
-  //   }, []);
-  const [firstName,  setFirstName] = React.useState("");
-  const [lastName,  setLastName] = React.useState("");
-  const [phone,  setPhone] = React.useState("");
-  const handleInfo = async() => {
-    let hi
-    try{
-       await database()
-        .ref(`/users/${user._user.uid}/info`)
-        .update({  Firstname: firstName,
-          Lastname: lastName,
-          Phone: phone,
-          Email:user._user.email,})
-        .then(res => {
-          setLoading(false);
-          console.log(res,res)
-          // navigation.goBack();
-        });
-      }
-      catch(err) {
-        console.log(err);
-      }
-      console.log("hiiiiiiiiiiiiiiiiiiii",hi);
+  const [loading, setLoading] = React.useState(true);
+  React.useEffect(() => {
+    const onValueChange = database()
+      .ref(`/users/${user._user.uid}/info`)
+      .on('value', (snapshot) => {
+        const info = snapshot.val();
+        setFirstName(info.Firstname);
+        setLastName(info.Lastname);
+        setPhone(info.Phone);
+      });
+    setLoading(false);
+    return () => database().ref(`/Data`).off('value', onValueChange);
+  }, []);
+  const [firstName, setFirstName] = React.useState('');
+  const [lastName, setLastName] = React.useState('');
+  const [phone, setPhone] = React.useState('');
+  const handleInfo = async () => {
+    let id = `/users/${user.uid}/info`;
+    const UserFirebase = id.toString();
+    console.log('UserFirebase', UserFirebase);
+    let task = await firebase
+      .database()
+      .ref(UserFirebase)
+      .update({
+        Firstname: firstName,
+        Lastname: lastName,
+        Phone: phone,
+        Email: user._user.email,
+      })
+      .then(() => {
+        navigation.goBack();
+      });
+    try {
+      setLoading(true);
+      task;
+      setLoading(false);
+    } catch (err) {
+      console.log(err);
+    }
   };
+
   if (!!loading) {
     return <LoadingIndicator />;
   } else {

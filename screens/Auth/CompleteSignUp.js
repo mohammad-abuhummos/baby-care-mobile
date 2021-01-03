@@ -11,11 +11,12 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import Button from '../../components/Button';
 import AppInput from '../../components/AppInput';
 import {UserContext} from '../../App';
-import {displayError} from '../../models/helpers';
 import CompleteSignUp from '../../models/CompleteSignUp';
+import {displayError} from '../../models/helpers';
+import LoadingIndicator from '../../components/LoadingIndicator';
 import database from '@react-native-firebase/database';
 export default function CompleteSignUpScreen({navigation}) {
-  const { user } = React.useContext(UserContext);
+  const {user} = React.useContext(UserContext);
   const [loading, setLoading] = React.useState(false);
   const [firstname, setFirstname] = React.useState('');
   const [lastname, setLastname] = React.useState('');
@@ -27,7 +28,7 @@ export default function CompleteSignUpScreen({navigation}) {
         Firstname: firstname,
         Lastname: lastname,
         Phone: phone,
-        Email:user._user.email,
+        Email: user._user.email,
       };
       database()
         .ref(`/users/${user._user.uid}`)
@@ -39,7 +40,9 @@ export default function CompleteSignUpScreen({navigation}) {
       displayError('Invalid Information', User_info.errors().join(', '));
     }
   };
-
+  if (!!loading) {
+    return <LoadingIndicator />;
+  }
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>

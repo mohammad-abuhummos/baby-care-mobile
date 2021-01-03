@@ -36,7 +36,7 @@ export default function EditBabyinfo({navigation}) {
       });
     setLoading(false);
     return () => database().ref(`/Data`).off('value', onValueChange);
-  }, [currntBaby]);
+  }, []);
   const [name, setName] = React.useState('');
   const [date, setDate] = React.useState(
     !!currntBaby ? currntBaby.date : '2016-10-10',

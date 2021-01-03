@@ -25,7 +25,7 @@ export default function UserProfile({navigation}) {
         setLoading(false);
       });
     return () => database().ref(`/Data`).off('value', onValueChange);
-  }, [userProfile]);
+  }, []);
   if (!!loading) {
     return <LoadingIndicator />;
   } else {

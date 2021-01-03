@@ -30,15 +30,16 @@ export default function Home() {
     return () =>
       database().ref(`users/${authContext}/baby/babyInfo`).off('value', onValueChange);
   }, []);
-  React.useEffect(() => {
-    // if (!!user) {      
-    //   if ((!!currnetSign && currnetSign.bpm === 0) || currnetSign.SpO2 === 0) {
-    //     setDialogVal({visible: true});
-    //   } else {
-    //     setDialogVal({visible: false});
-    //   }
-    // }
-  }, [currnetSign]);
+
+  // React.useEffect(() => {
+  //   // if (!!user) {      
+  //   //   if ((!!currnetSign && currnetSign.bpm === 0) || currnetSign.SpO2 === 0) {
+  //   //     setDialogVal({visible: true});
+  //   //   } else {
+  //   //     setDialogVal({visible: false});
+  //   //   }
+  //   // }
+  // }, []);
   return (
     <View
       style={{

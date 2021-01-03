@@ -45,7 +45,7 @@ export default function BabyProfile({navigation}) {
         setLoading(false)
       });
     return () => database().ref(`/Data`).off('value', onValueChange);
-  }, [currntBaby]);
+  }, []);
   const pickImage = () => {};
   if (!!loading) {
     return <LoadingIndicator />
