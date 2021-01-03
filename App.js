@@ -7,176 +7,21 @@
  */
 import 'react-native-gesture-handler';
 import React, {useState, useEffect} from 'react';
-import {StyleSheet, Text, View, Image} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 // import WelcomeScreen from './screens/WelcomeScreen';
-import Placeholder from './screens/Placeholder';
 import SignIn from './screens/Auth/SignIn';
 import SignUp from './screens/Auth/SignUp';
 import CompleteSignUp from './screens/Auth/CompleteSignUp';
 import {NavigationContainer, DrawerItems} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
-import {
-  createDrawerNavigator,
-  DrawerItemList,
-  DrawerItem,
-} from '@react-navigation/drawer';
 import auth from '@react-native-firebase/auth';
 import CreateBabyAccount from './screens/Auth/CreateBabyAccount';
-import Home from './screens/Home';
-import BabyProfile from './screens/BabyProfile';
-import EditBabyinfo from './screens/EditBabyinfo';
 import LoadingIndicator from './components/LoadingIndicator';
-import UserProfile from './screens/UserProfile';
-import EditUserProfile from './screens/EditUserProfile';
-import Statistics from './screens/Statistics';
-
-
-
+import AppDrawer from './roots/Drawer';
 export const UserContext = React.createContext();
 export default function App() {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState(null);
-  const signOut = () => {
-    setInitializing(true);
-    auth()
-      .signOut()
-      .then(() => setUser(null));
-  };
-  const Drawer = createDrawerNavigator();
-  const ProfileStack = createStackNavigator();
-
-  function Profile() {
-    return (
-      <>
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false,
-          }}>
-          <ProfileStack.Screen
-            name="ProfileInfo"
-            options={{
-              title: 'Profile',
-              headerStyle: {
-                backgroundColor: '#EE979F',
-              },
-              headerTintColor: '#fff',
-              headerTitleStyle: {
-                fontWeight: 'bold',
-              },
-            }}
-            component={UserProfile}
-          />
-          <Stack.Screen
-            name="EditUserProfile"
-            options={{
-              title: 'Edit Profile',
-              headerStyle: {
-                backgroundColor: '#EE979F',
-              },
-              headerTintColor: '#fff',
-              headerTitleStyle: {
-                fontWeight: 'bold',
-              },
-            }}
-            component={EditUserProfile}
-          />
-        </Stack.Navigator>
-      </>
-    );
-  }
-
-  function CustomDrawerContentComponent(props) {
-    return (
-      <View style={{paddingVertical: 60}}>
-        <DrawerItemList {...props} />
-        <DrawerItem label="Sign Out" onPress={() => signOut()} />
-      </View>
-    );
-  }
-
-  function AppDrawer() {
-    return (
-      <Drawer.Navigator
-        screenOptions={{headerShown: true}}
-        drawerStyle={{
-          backgroundColor: 'rgba(238, 151, 159, 0.8)',
-          width: 240,
-        }}
-        initialRouteName="Home"
-        drawerContent={(props) => <CustomDrawerContentComponent {...props} />}>
-        <Drawer.Screen
-          name="Home"
-          options={{
-            title: 'Home',
-            headerStyle: {
-              backgroundColor: '#EE979F',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }}
-          component={Home}
-        />
-        <Drawer.Screen
-          name="Statistics"
-          options={{
-            title: 'Statistics',
-            headerStyle: {
-              backgroundColor: '#EE979F',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }}
-          component={Statistics}
-        />
-        <Drawer.Screen
-          name="BabyProfile"
-          options={{
-            title: 'Baby Profile',
-            headerStyle: {
-              backgroundColor: '#EE979F',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }}
-          component={BabyProfile}
-        />
-        <Drawer.Screen
-          name="UserProfile"
-          options={{
-            title: 'Profile',
-            headerStyle: {
-              backgroundColor: '#EE979F',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }}
-          component={Profile}
-        />
-        <Drawer.Screen
-          name="EditBabyinfo"
-          options={{
-            title: 'EditBabyinfo',
-            headerStyle: {
-              backgroundColor: '#EE979F',
-            },
-            headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
-          }}
-          component={EditBabyinfo}
-        />
-      </Drawer.Navigator>
-    );
-  }
 
   function onAuthStateChanged(user) {
     setUser(user);
@@ -191,6 +36,7 @@ export default function App() {
   const appUserContext = {
     user,
     setInitializing,
+    setUser,
   };
   if (initializing) {
     return <LoadingIndicator />;
