@@ -1,4 +1,4 @@
-import {isPresent, isValidEmail, isMatching, isName, isPhone} from './helpers';
+import {isName, isPhone} from './helpers';
 
 export default class CompleteSignUp {
   constructor(firstname, lastname, phone) {
