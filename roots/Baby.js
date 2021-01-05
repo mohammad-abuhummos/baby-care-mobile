@@ -12,7 +12,7 @@ export default function BabyStack() {
         screenOptions={{
           headerShown: false,
         }}>
-        <Drawer.Screen
+        <Baby.Screen
           name="BabyProfile"
           options={{
             title: 'Baby Profile',
