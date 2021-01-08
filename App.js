@@ -42,21 +42,21 @@ export default function App() {
     return <LoadingIndicator />;
   } else {
     return (
-      <UserContext.Provider value={appUserContext}>
-        <NavigationContainer>
-          <View>
-            {!!user ? (
-              <Text>
-                Welcome{user._user.email} + {user._user.uid}
-              </Text>
-            ) : (
-              <Text>Login</Text>
-            )}
-          </View>
-          <Stack.Navigator
-            screenOptions={{
-              headerShown: false,
-            }}>
+      <NavigationContainer>
+        <View>
+          {!!user ? (
+            <Text>
+              Welcome{user._user.email} + {user._user.uid}
+            </Text>
+          ) : (
+            <Text>Login</Text>
+          )}
+        </View>
+        <UserContext.Provider value={appUserContext}>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+          }}>
             {!!user ? (
               <>
                 <Stack.Screen name="Home" component={AppDrawer} />
@@ -89,9 +89,9 @@ export default function App() {
                 />
               </>
             )}
-          </Stack.Navigator>
-        </NavigationContainer>
-      </UserContext.Provider>
+        </Stack.Navigator>
+          </UserContext.Provider>
+      </NavigationContainer>
     );
   }
 }
