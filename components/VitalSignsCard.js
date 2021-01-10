@@ -27,7 +27,7 @@ function Status(from, to, current) {
 }
 
 export function VitalSignsCard(props) {
-  const {name, symbols, from, to, currnet,samllSymbols} = props;
+  const {name, symbols, from, to, currnet, samllSymbols} = props;
   let color = ColorRange(from, to, currnet);
   return (
     <Card>
@@ -37,12 +37,10 @@ export function VitalSignsCard(props) {
             {currnet}
           </Text>
         </View>
-        {!!symbols && 
-        <Text style={styles.Sings}>{symbols}</Text>
-        }
-        {!!samllSymbols && 
-        <Text style={styles.samllSymbols}>{samllSymbols}</Text>
-        }
+        {!!symbols && <Text style={styles.Sings}>{symbols}</Text>}
+        {!!samllSymbols && (
+          <Text style={styles.samllSymbols}>{samllSymbols}</Text>
+        )}
         <View style={styles.status}>
           <Text style={[styles.textCenter, styles.text]}>{name}</Text>
           <Text style={[styles.textCenter, styles.text, {color: color}]}>
@@ -55,31 +53,40 @@ export function VitalSignsCard(props) {
 }
 
 export function BabyInfoCard(props) {
-  const {color, img, name, status, isSleep, from, to} = props;
-  const [statusColor, setStatusColor] = React.useState(color);
+  const {img, name, status} = props;
   return (
     <Card>
       <View style={styles.container}>
-        <View style={[styles.Vital, {borderColor: statusColor}]}>
+        <View style={styles.Vital}>
           {!!img && (
             <Image
               source={img}
-              style={{width: 80, height: 80, borderRadius: 50}}
+              style={{
+                width: 100,
+                height: 100,
+                borderRadius: 100,
+                resizeMode: 'center',
+              }}
             />
           )}
         </View>
         <View style={styles.info}>
           <Text style={[styles.smallText]}>{name}</Text>
-          {!!status && (
+          {!!status ? (
             <View style={{display: 'flex', flexDirection: 'row'}}>
               <Text style={[styles.smallText]}>Status:</Text>
-              <Text style={[styles.smallText, {color: statusColor}]}>
-                {status}
+              <Text style={[styles.smallText, {color: '#C3F584'}]}>
+                Connected
               </Text>
             </View>
-          )}
-          {!isSleep && (
-            <Text style={[styles.smallText]}>Your baby {name} is Sleeping</Text>
+          ) : (
+            <View style={{display: 'flex', flexDirection: 'row'}}>
+              <Text style={[styles.smallText]}>Status:</Text>
+              <Text style={[styles.smallText, {color: '#FF3D00'}]}>
+                {' '}
+                Disconnected
+              </Text>
+            </View>
           )}
         </View>
       </View>
