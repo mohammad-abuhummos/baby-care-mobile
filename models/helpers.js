@@ -18,7 +18,7 @@ export function isMatching(val_1, val_2) {
 }
 
 export function isPasword(val_1) {
-  return isPresent(val_1) && val_1 > 3;
+  return  String(val_1).length >=6;
 }
 
 export function isName(val_1) {
