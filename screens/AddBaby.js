@@ -10,53 +10,72 @@ import {
   Alert,
 } from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
-import Button from '../../components/Button';
-import AppInput from '../../components/AppInput';
-import {UserContext} from '../../App';
+import Button from '../components/Button';
+import AppInput from '../components/AppInput';
+import {UserContext} from '../App';
 import database from '@react-native-firebase/database';
 import DatePicker from 'react-native-datepicker';
 import RadioButtonRN from 'radio-buttons-react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
-import LoadingIndicator from '../../components/LoadingIndicator';
+import LoadingIndicator from '../components/LoadingIndicator';
 
-export default function CreateBabyAccount({navigation}) {
-  const {user, setUserAuth, bracelet ,setBabyId} = React.useContext(UserContext);
+export default function AddBaby({navigation}) {
+  const {user} = React.useContext(UserContext);
   const [loading, setLoading] = React.useState(false);
   const [uploading, setUploading] = React.useState(false);
-  const currentDate = () => {
-    return new Date().toJSON().slice(0, 10).replace(/-/g, '-');
-  };
-  const [image, setImage] = React.useState(null);
+  const [image, setImage] = React.useState(false);
+  const [imageUrl, setImageUrl] = React.useState(null);
   console.log('image:', image);
+  console.log('imageURURl:', imageUrl);
   const [name, setName] = React.useState('');
   const [date, setDate] = React.useState('2016-05-15');
   const [gender, setGender] = React.useState('Female');
+  React.useEffect(() => {
+    if (!!imageUrl) {
+      updateImge();
+    }
+  }, [imageUrl]);
+  const getBabyImage = async () => {
+    try {
+      const url = await storage()
+        .ref(`/users/${user._user.uid}/baby/${user._user.uid}${name}/`)
+        .getDownloadURL();
+      setImageUrl(url);
+    } catch (error) {
+      setLoading(false);
+    }
+  };
+  const updateImge = () => {
+    const babyInfo = {
+      name: name,
+      date: date,
+      gender: gender,
+      img: imageUrl,
+    };
+    database()
+      .ref(`/users/${user._user.uid}/baby/${user._user.uid}${name}/`)
+      .update({babyInfo})
+      .then(() => {
+        setLoading(false);
+      });
+  };
+  const currentDate = () => {
+    return new Date().toJSON().slice(0, 10).replace(/-/g, '-');
+  };
   const handleInfo = () => {
     setLoading(true);
     const babyInfo = {
       name: name,
       date: date,
       gender: gender,
+      img: image,
     };
     database()
       .ref(`/users/${user._user.uid}/baby/${user._user.uid}${name}/`)
       .set({babyInfo})
       .then(() => {
-        setBabyId(`${user._user.uid}${name}`)
-        Updatebarclet();
-        uploadImage(image);
-      });
-  };
-  const Updatebarclet = () => {
-    database()
-      .ref(`${bracelet}`)
-      .update({
-        babyId: `${user._user.uid}${name}`,
-        userId: `${user._user.uid}`,
-      })
-      .then(() => {
-
+        uploadImage(image).then(() => getBabyImage());
       });
   };
   const data = [
@@ -91,17 +110,12 @@ export default function CreateBabyAccount({navigation}) {
     setLoading(true);
     const task = storage().ref(fileKey).putFile(uploadUri);
     try {
-      await task;
+      await task.then();
     } catch (e) {
+      setLoading(false);
       console.error(e);
     }
     setUploading(false);
-    setLoading(true);
-    setUserAuth(true);
-    // Alert.alert(
-    //   'Photo uploaded!',
-    //   'Your photo has been uploaded to Firebase Cloud Storage!',
-    // );
   };
   if (!!loading) {
     return <LoadingIndicator />;
@@ -112,7 +126,7 @@ export default function CreateBabyAccount({navigation}) {
         <View style={{position: 'absolute', top: 10, left: 20}}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Image
-              source={require('../../assets/back-icon.png')}
+              source={require('../assets/back-icon.png')}
               style={{
                 width: 50,
                 height: 50,
@@ -121,29 +135,6 @@ export default function CreateBabyAccount({navigation}) {
             />
           </TouchableOpacity>
         </View>
-        <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Image
-            source={require('../../assets/CreateBaby.png')}
-            style={{
-              width: 200,
-              height: 70,
-              resizeMode: 'center',
-              marginBottom: -10,
-            }}
-          />
-          <Image
-            source={require('../../assets/header.png')}
-            style={{
-              width: Dimensions.get('window').width,
-              resizeMode: 'contain',
-              // aspectRatio: 1 / 2,
-            }}
-          />
-        </View>
         <View style={styles.InnerContainer}>
           <View style={{paddingTop: 10}}>
             <TouchableOpacity onPress={pickImage}>
@@ -151,7 +142,7 @@ export default function CreateBabyAccount({navigation}) {
                 source={
                   !!image
                     ? {uri: image}
-                    : require('../../assets/add-image-icon.png')
+                    : require('../assets/add-image-icon.png')
                 }
                 style={
                   !!image
@@ -304,5 +295,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingTop: 20,
   },
 });

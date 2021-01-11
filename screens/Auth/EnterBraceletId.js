@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   StyleSheet,
-  Text,
   View,
   Image,
   SafeAreaView,
@@ -12,37 +11,12 @@ import Button from '../../components/Button';
 import AppInput from '../../components/AppInput';
 import UserSignIn from '../../models/UserSignIn';
 import {displayError} from '../../models/helpers';
-import auth from '@react-native-firebase/auth';
 import LoadingIndicator from '../../components/LoadingIndicator';
-
-export default function SignInScreen({navigation}) {
+import {UserContext} from '../../App';
+export default function EnterBraceletId({navigation}) {
   const [loading, setLoading] = React.useState(false);
-  const [Email, setEmail] = React.useState();
-  const [Password, setPassword] = React.useState();
-  const input = {
-    email: Email,
-    password: Password,
-  };
-  const validate = (email, password) => {
-    setLoading(true);
-    let sign_in_info = new UserSignIn(email, password);
-    if (sign_in_info.isValid()) {
-      auth()
-        .signInWithEmailAndPassword(email, password)
-        .then(() => {
-          console.log('User account created & signed in!');
-        })
-        .catch((error) => {
-          setLoading(false);
-          displayError('Invalid Information', 'invalid email or password');
-          console.log(error);
-        });
-    } else {
-      setLoading(false);
-      console.log(sign_in_info.errors());
-      displayError('Invalid Information', sign_in_info.errors().join(', '));
-    }
-  };
+  const {setBracelet} = React.useContext(UserContext);
+  const [BarcletId, setBarcletId] = React.useState();
   if (loading) {
     return <LoadingIndicator />;
   } else {
@@ -55,7 +29,7 @@ export default function SignInScreen({navigation}) {
               alignItems: 'center',
             }}>
             <Image
-              source={require('../../assets/Signin.png')}
+              source={require('../../assets/Barcletid.png')}
               style={{
                 width: 100,
                 height:70,
@@ -85,25 +59,15 @@ export default function SignInScreen({navigation}) {
               />
             </View>
             <View style={{paddingTop: 30}}>
-              <AppInput label="Email" onChangeText={(text) => setEmail(text)} />
-            </View>
-            <View style={{paddingTop: 30}}>
-              <AppInput
-                label="Password"
-                onChangeText={(text) => setPassword(text)}
-                secureTextEntry={true}
-              />
+              <AppInput label="Barclet id" onChangeText={(text) => setBarcletId(text)} />
             </View>
             <View style={{paddingTop: 30}}>
               <Button
-                title="Sign in"
-                onPress={() => validate(Email, Password)}
-              />
-            </View>
-            <View style={{paddingTop: 30}}>
-              <Button
-                title="Sign up"
-                onPress={() => navigation.navigate('EnterBraceletId')}
+                title="Next"
+                onPress={() => {
+                  setBracelet(BarcletId);
+                  navigation.navigate('SignUp')
+                }}
               />
             </View>
           </View>

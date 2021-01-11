@@ -11,15 +11,21 @@ import ProfileStack from '../roots/Profile';
 import {UserContext} from '../App';
 import auth from '@react-native-firebase/auth';
 import BabyStack from './Baby';
+import BabyAccounts from '../screens/BabyAccounts';
+import BabyAccountsStack from './BabyAccounts';
 const Drawer = createDrawerNavigator();
 
+BabyAccountsStack
+
 export default function AppDrawer() {
-  const {setInitializing, setUser} = React.useContext(UserContext);
+  const {setInitializing, setUser,setUserAuth} = React.useContext(UserContext);
   const signOut = () => {
     setInitializing(true);
     auth()
       .signOut()
-      .then(() => setUser(null));
+      .then(() => {setUser(null)
+        setUserAuth(false);
+      });
   };
   function CustomDrawerContentComponent(props) {
     return (
@@ -108,6 +114,20 @@ export default function AppDrawer() {
           },
         }}
         component={BabyStack}
+      />
+      <Drawer.Screen
+        name="BabyAccountsStack"
+        options={{
+          title: 'Baby Accounts',
+          headerStyle: {
+            backgroundColor: '#EE979F',
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+          },
+        }}
+        component={BabyAccountsStack}
       />
     </Drawer.Navigator>
   );
