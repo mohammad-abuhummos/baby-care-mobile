@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   StyleSheet,
-  Text,
+  Dimensions,
   View,
   Image,
   SafeAreaView,
@@ -46,7 +46,7 @@ export default function CompleteSignUpScreen({navigation}) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <View style={{position: 'absolute', top: 30, left: 20}}>
+        <View style={{position: 'absolute', top: 10, left: 20}}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Image
               source={require('../../assets/back-icon.png')}
@@ -58,8 +58,28 @@ export default function CompleteSignUpScreen({navigation}) {
             />
           </TouchableOpacity>
         </View>
-        <View style={{paddingTop: 20, alignItems: 'center'}}>
-          <Text style={styles.HedaerPink}>Complete Profile</Text>
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Image
+            source={require('../../assets/Signup.png')}
+            style={{
+              width: 100,
+              height: 70,
+              resizeMode: 'center',
+              marginBottom: -10,
+            }}
+          />
+          <Image
+            source={require('../../assets/header.png')}
+            style={{
+              width: Dimensions.get('window').width,
+              resizeMode: 'contain',
+              // aspectRatio: 1 / 2,
+            }}
+          />
         </View>
         <View style={styles.InnerContainer}>
           <View style={{paddingTop: 10}}>
@@ -96,7 +116,7 @@ export default function CompleteSignUpScreen({navigation}) {
           </View>
           <View style={{paddingTop: 30}}>
             <Button
-              title="Finsh"
+              title="Next"
               onPress={() => handleInfo(firstname, lastname, phone)}
             />
           </View>

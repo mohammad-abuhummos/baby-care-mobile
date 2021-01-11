@@ -1,4 +1,4 @@
-import {isPresent, isValidEmail, isMatching} from './helpers';
+import {isPasword, isValidEmail, isMatching} from './helpers';
 
 export default class UserSignUp {
   constructor(
@@ -18,6 +18,7 @@ export default class UserSignUp {
   errors() {
     let errors_arr = [];
     if (!isValidEmail(this.email)) errors_arr.push('Invalid email');
+    if (!isPasword(this.password)) errors_arr.push('Password must be gerater than');
     if (!isMatching(this.password, this.password_confirmation))
       errors_arr.push('Password is not valid');
     return errors_arr;
