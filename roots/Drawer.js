@@ -13,9 +13,8 @@ import auth from '@react-native-firebase/auth';
 import BabyStack from './Baby';
 import BabyAccounts from '../screens/BabyAccounts';
 import BabyAccountsStack from './BabyAccounts';
+import Connect from '../screens/Connect';
 const Drawer = createDrawerNavigator();
-
-BabyAccountsStack
 
 export default function AppDrawer() {
   const {setInitializing, setUser,setUserAuth} = React.useContext(UserContext);
@@ -101,10 +100,10 @@ export default function AppDrawer() {
         }}
         component={ProfileStack}
       />
-      {/* <Drawer.Screen
-        name="BabyProfile"
+      <Drawer.Screen
+        name="Connect"
         options={{
-          title: 'Baby Profile',
+          title: 'Connect',
           headerStyle: {
             backgroundColor: '#EE979F',
           },
@@ -113,8 +112,8 @@ export default function AppDrawer() {
             fontWeight: 'bold',
           },
         }}
-        component={BabyStack}
-      /> */}
+        component={Connect}
+      />
       <Drawer.Screen
         name="BabyAccountsStack"
         options={{
