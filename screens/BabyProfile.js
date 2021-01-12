@@ -13,22 +13,29 @@ import {UserContext} from '../App';
 import database from '@react-native-firebase/database';
 import LabelAndText from '../components/LabelAndText';
 import LoadingIndicator from '../components/LoadingIndicator';
-export default function BabyProfile({navigation}) {
-  const {user} = React.useContext(UserContext);
+
+export default function BabyProfile({route, navigation}) {
+  const {bracelet, user, setReload, setInitializing} = React.useContext(
+    UserContext,
+  );
   const [loading, setLoading] = React.useState(true);
   const currentDate = () => {
     return new Date().toJSON().slice(0, 10).replace(/-/g, '-');
   };
-  const [currntBaby, setCurrntBaby] = React.useState();
-  const [gender, setGender] = React.useState('Female');
-  const data = [
-    {
-      label: 'Female',
-    },
-    {
-      label: 'Male',
-    },
-  ];
+
+  const parms = route.params;
+
+  const Updatebarclet = () => {
+    database()
+      .ref(`${bracelet}`)
+      .update({babyId: `${parms.id}`, userId: `${user.uid}`})
+      .then(() => {
+        setInitializing(true);
+        setReload(true);
+        // navigation.navigate('Home');
+      });
+  };
+
   const CalculateAge = (birthday) => {
     if (!!birthday) {
       const today = currentDate().split('-');
@@ -38,47 +45,67 @@ export default function BabyProfile({navigation}) {
   };
 
   React.useEffect(() => {
-    const onValueChange = database()
-      .ref(`/users/${user._user.uid}/baby/babyInfo`)
-      .on('value', (snapshot) => {
-        setCurrntBaby(snapshot.val());
-        setLoading(false)
-      });
-    return () => database().ref(`/Data`).off('value', onValueChange);
+    // const onValueChange = database()
+    //   .ref(`/users/${user._user.uid}/baby/babyInfo`)
+    //   .on('value', (snapshot) => {
+    //     setCurrntBaby(snapshot.val());
+    //   });
+    //   return () => database().ref(`/Data`).off('value', onValueChange);
+    setLoading(false);
   }, []);
-  const pickImage = () => {};
   if (!!loading) {
-    return <LoadingIndicator />
+    return <LoadingIndicator />;
   } else {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.InnerContainer}>
           <View>
-            <TouchableOpacity onPress={pickImage}>
+            <TouchableOpacity>
               <Image
-                source={require('../assets/add-image-icon.png')}
+                source={
+                  !!parms.info.img
+                    ? {uri: parms.info.img}
+                    : require('../assets/add-image-icon.png')
+                }
                 style={{
                   width: 180,
                   height: 180,
+                  borderRadius: 100,
                 }}
               />
             </TouchableOpacity>
           </View>
           <View style={{paddingTop: 30}}>
-            <LabelAndText label="Name" text={!!currntBaby && currntBaby.name} />
+            <LabelAndText label="Name" text={parms.info.name} />
           </View>
           <View style={{paddingTop: 30}}>
             <LabelAndText
               label="Age"
-              text={CalculateAge(!!currntBaby && currntBaby.date)}
+              text={`${CalculateAge(parms.info.date)} year`}
             />
           </View>
           <View style={{paddingTop: 30}}>
-            <LabelAndText label="Gender" text={!!currntBaby && currntBaby.gender} />
+            <LabelAndText label="Gender" text={parms.info.gender} />
           </View>
-  
-          <View style={{paddingTop: 50,paddingHorizontal:50}}>
-            <Button title="Edit" onPress={() => navigation.navigate('EditBabyinfo')} />
+
+          <View
+            style={{
+              paddingTop: 50,
+              paddingHorizontal: 10,
+              display: 'flex',
+              flexDirection: 'row',
+              width: '100%',
+              justifyContent: 'space-around',
+            }}>
+            <View style={{width: 140}}>
+              <Button title="Select Baby" onPress={() => Updatebarclet()} />
+            </View>
+            <View style={{width: 140}}>
+              <Button
+                title="Edit"
+                onPress={() => navigation.navigate('EditBabyinfo', parms)}
+              />
+            </View>
           </View>
         </View>
       </SafeAreaView>

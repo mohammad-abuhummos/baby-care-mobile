@@ -3,7 +3,7 @@ import {createStackNavigator} from '@react-navigation/stack';
 import Accounts from '../screens/BabyAccounts';
 import EditBabyinfo from '../screens/EditBabyinfo';
 import AddBaby from '../screens/AddBaby';
-
+import BabyProfile from '../screens/BabyProfile';
 const BabyAccounts = createStackNavigator();
 
 
@@ -41,6 +41,34 @@ export default function BabyAccountsStack() {
             },
           }}
           component={AddBaby}
+        />
+        <BabyAccounts.Screen
+          name="BabyProfile"
+          options={{
+            title: 'Baby Profile',
+            headerStyle: {
+              backgroundColor: '#EE979F',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }}
+          component={BabyProfile}
+        />
+        <BabyAccounts.Screen
+          name="EditBabyinfo"
+          options={{
+            title: 'Edit Baby',
+            headerStyle: {
+              backgroundColor: '#EE979F',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }}
+          component={EditBabyinfo}
         />
       </BabyAccounts.Navigator>
     </>

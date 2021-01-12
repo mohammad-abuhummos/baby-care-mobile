@@ -101,7 +101,7 @@ export default function AppDrawer() {
         }}
         component={ProfileStack}
       />
-      <Drawer.Screen
+      {/* <Drawer.Screen
         name="BabyProfile"
         options={{
           title: 'Baby Profile',
@@ -114,7 +114,7 @@ export default function AppDrawer() {
           },
         }}
         component={BabyStack}
-      />
+      /> */}
       <Drawer.Screen
         name="BabyAccountsStack"
         options={{

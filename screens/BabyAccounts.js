@@ -10,49 +10,50 @@ import {
 import {BabyInfoCard} from '../components/VitalSignsCard';
 import database from '@react-native-firebase/database';
 import {UserContext} from '../App';
-import storage from '@react-native-firebase/storage';
 import Card from '../components/Card';
 export default function BabyAccounts({navigation}) {
   const {babyId, user} = React.useContext(UserContext);
-  const [babyImage, setBabyImage] = React.useState(null);
   const [Baby, setBaby] = React.useState([]);
-  console.log(babyImage);
-  const getBabyImage = async () => {
-    try {
-      const url = await storage()
-        .ref(`users/${user.uid}/baby/${babyId}`)
-        .getDownloadURL();
-      setBabyImage(url);
-    } catch (error) {}
-  };
   React.useEffect(() => {
     const onValueChange = database()
       .ref(`users/${user.uid}/baby/`)
       .on('value', (snapshot) => {
         setBaby(snapshot.val());
-        console.log(snapshot.val());
       });
 
     return () =>
       database().ref(`users/${user.uid}`).off('value', onValueChange);
   }, []);
-  React.useEffect(() => {
-    getBabyImage();
-  }, []);
+
   React.useEffect(() => {}, []);
 
   const RenderBaby = (babys) => {
     return Object.keys(babys).map((key) => {
-      console.log(key, babys[key].babyInfo);
+      let id = key;
       let info = babys[key].babyInfo;
+      let parms = {
+        id: id,
+        info: info,
+      };
       return (
-        <View style={{paddingTop: 30, width: '100%'}}>
-          <BabyInfoCard
-            name={info.name}
-            img={!!babyImage && {uri: babyImage}}
-            color="#fff"
-          />
-        </View>
+        <TouchableOpacity
+          key={id}
+          onPress={() => {
+            navigation.navigate('BabyProfile', parms);
+          }}>
+          <View style={{paddingTop: 30, width: '100%'}}>
+            <BabyInfoCard
+              name={info.name}
+              img={
+                !!info.img
+                  ? {uri: info.img}
+                  : require('../assets/profile-icon.png')
+              }
+              color="#fff"
+              status={babyId === id}
+            />
+          </View>
+        </TouchableOpacity>
       );
     });
   };
@@ -62,7 +63,7 @@ export default function BabyAccounts({navigation}) {
         <View
           style={{
             flex: 1,
-            padding:20,
+            padding: 20,
           }}>
           {RenderBaby(Baby)}
           <View style={{paddingTop: 30, width: '100%'}}>

@@ -20,7 +20,7 @@ import SelectButton from '../components/SelectButton';
 import dayjs from 'dayjs';
 
 export default function Statistics({navigation}) {
-  const {user} = React.useContext(UserContext);
+  const {user,babyId} = React.useContext(UserContext);
   const [loading, setLoading] = React.useState(true);
   const [loadingChart, setLoadingChart] = React.useState(false);
   const [userProfile, setuserProfile] = React.useState();
@@ -185,7 +185,7 @@ export default function Statistics({navigation}) {
       console.log('endAt', dayjs.unix(end).toISOString());
       const scores = await database()
         .ref(
-          `users/1TkE3yikUUbJknPu7SSk9GNB1Ao2/baby/1TkE3yikUUbJknPu7SSk9GNB1Ao21/logs/${Sign}`,
+          `users/${user.uid}/baby/${babyId}/logs/${Sign}`,
         )
         .orderByKey()
         .startAt(`${end}`)
@@ -340,7 +340,7 @@ export default function Statistics({navigation}) {
               </View>
             )}
           </View>
-          <Button title="qury" onPress={() => qury()} />
+          {/* <Button title="qury" onPress={() => qury()} /> */}
         </View>
       </SafeAreaView>
     );

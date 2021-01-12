@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import React from 'react';
 import {Alert} from 'react-native';
 export function isPresent(val) {
@@ -46,4 +47,8 @@ export function parseDate(date) {
 
 export function displayError(title, body = null) {
   Alert.alert(title, body);
+}
+
+export function ConvertUnixToDate(date) {
+  return dayjs.unix(date).toISOString();
 }

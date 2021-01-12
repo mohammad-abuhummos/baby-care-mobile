@@ -19,43 +19,58 @@ import RadioButtonRN from 'radio-buttons-react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
 
-export default function EditBabyinfo({navigation}) {
-  const [currntBaby, setCurrntBaby] = React.useState();
-  const {user, setIsLoading} = React.useContext(UserContext);
+export default function EditBabyinfo({route, navigation}) {
+  const parms = route.params;
+  // const [currntBaby, setCurrntBaby] = React.useState();
+  const {user} = React.useContext(UserContext);
   const [image, setImage] = React.useState(null);
   const [uploading, setUploading] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
+  const [name, setName] = React.useState(parms.info.name);
+  const [date, setDate] = React.useState(parms.info.date);
+  const [imageUrl, setImageUrl] = React.useState(null);
+  const [gender, setGender] = React.useState(parms.info.gender);
   const currentDate = () => {
     return new Date().toJSON().slice(0, 10).replace(/-/g, '-');
   };
+
+  // React.useEffect(() => {
+  //   if (!!imageUrl) {
+  //     updateImge();
+  //   }
+  // }, [imageUrl]);
+  const getBabyImage = async () => {
+    try {
+      const url = await storage()
+        .ref(`/users/${user._user.uid}/baby/${parms.id}/`)
+        .getDownloadURL();
+      setImageUrl(url);
+      console.log('url-----', url);
+      setUploading(false);
+    } catch (error) {
+      setUploading(false);
+      setLoading(false);
+    }
+  };
+
   React.useEffect(() => {
-    const onValueChange = database()
-      .ref(`/users/${user._user.uid}/baby/babyInfo`)
-      .on('value', (snapshot) => {
-        setCurrntBaby(snapshot.val());
-      });
     setLoading(false);
-    return () => database().ref(`/Data`).off('value', onValueChange);
   }, []);
-  const [name, setName] = React.useState('');
-  const [date, setDate] = React.useState(
-    !!currntBaby ? currntBaby.date : '2016-10-10',
-  );
-  const [gender, setGender] = React.useState('Female');
   const handleInfo = () => {
-    setIsLoading(true);
+    setLoading(true);
+    // setIsLoading(true);
     const babyInfo = {
       name: name,
       date: date,
       gender: gender,
+      img: !!imageUrl ? imageUrl : parms.info.img,
     };
     database()
-      .ref(`/users/${user._user.uid}/baby`)
-      .set({babyInfo})
+      .ref(`/users/${user._user.uid}/baby/${parms.id}/`)
+      .update({babyInfo})
       .then(() => {
-        setIsLoading(false);
         setLoading(false);
-        navigation.navigate('BabyProfile');
+        navigation.navigate('Accounts');
       });
   };
   const data = [
@@ -70,7 +85,7 @@ export default function EditBabyinfo({navigation}) {
   const pickImage = () => {
     ImagePicker.openPicker({
       width: 300,
-      height: 400,
+      height: 300,
       cropping: true,
     }).then((image) => {
       console.log('image =>', image);
@@ -81,20 +96,17 @@ export default function EditBabyinfo({navigation}) {
   };
 
   const uploadImage = async (uri) => {
-    const fileKey = user.uid;
+    const fileKey = `/users/${user._user.uid}/baby/${parms.id}/`;
     const uploadUri = uri;
     setUploading(true);
     const task = storage().ref(fileKey).putFile(uploadUri);
     try {
       await task;
+      console.log('uploading');
     } catch (e) {
       console.error(e);
     }
-    setUploading(false);
-    Alert.alert(
-      'Photo uploaded!',
-      'Your photo has been uploaded to Firebase Cloud Storage!',
-    );
+    getBabyImage();
   };
 
   if (!!loading || uploading) {
@@ -104,24 +116,37 @@ export default function EditBabyinfo({navigation}) {
       <SafeAreaView style={styles.container}>
         <ScrollView>
           <View style={styles.InnerContainer}>
-            <View style={{paddingTop: 10}}>
-              <TouchableOpacity onPress={pickImage}>
+            <TouchableOpacity onPress={pickImage}>
+              <View style={{paddingTop: 40}}>
+                {!!parms.info.img && (
+                  <View style={{position: 'absolute', top: 40, zIndex: 5}}>
+                    <Image
+                      source={require('../assets/add-image.png')}
+                      style={{
+                        width: 180,
+                        height: 180,
+                        borderRadius: 100,
+                      }}
+                    />
+                  </View>
+                )}
                 <Image
                   source={
-                    !!image
-                      ? {uri: image}
-                      : require('../assets/add-image-icon.png')
+                    !!parms.info.img
+                      ? {uri: !!image ? image : parms.info.img}
+                      : require('../assets/profile-icon.png')
                   }
                   style={{
                     width: 180,
                     height: 180,
+                    borderRadius: 100,
                   }}
                 />
-              </TouchableOpacity>
-            </View>
+              </View>
+            </TouchableOpacity>
             <View style={{paddingTop: 30}}>
               <AppInput
-                placeholder={!!currntBaby ? currntBaby.name : 'New Name'}
+                placeholder={parms.info.name}
                 label="Name"
                 autoCapitalize="words"
                 onChangeText={(text) => setName(text)}
@@ -171,7 +196,7 @@ export default function EditBabyinfo({navigation}) {
                     style={{width: '100%'}}
                     date={date}
                     mode="date"
-                    placeholder={!!currntBaby ? currntBaby.date : 'select date'}
+                    placeholder={parms.info.date}
                     format="YYYY-MM-DD"
                     minDate="2016-05-01"
                     maxDate={currentDate()}
