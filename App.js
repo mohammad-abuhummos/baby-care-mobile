@@ -28,27 +28,32 @@ export default function App() {
   const [babyId, setBabyId] = useState(null);
   const [bracelet, setBracelet] = useState(null);
   const [braceletIds, setBraceletIds] = useState(null);
+  const [reload, setReload] = useState(null);
+
   function onAuthStateChanged(user) {
-    setUser(user); 
+    setUser(user);
     if (!!user) {
-      setUserAuth(true)
-    } 
+      setUserAuth(true);
+    }
     if (initializing) setInitializing(false);
   }
   useEffect(() => {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
     return subscriber; // unsubscribe on unmount
   }, [userAuth]);
+  useEffect(() => {
+    setInitializing(false);
+  }, [reload]);
 
- 
   const Stack = createStackNavigator();
   const appUserContext = {
     user,
     bracelet,
     babyId,
     braceletIds,
+    setReload,
     setInitializing,
-    setUser, 
+    setUser,
     setBracelet,
     setUserAuth,
     setBabyId,
@@ -102,7 +107,7 @@ export default function App() {
                   name="EnterBraceletId"
                   component={EnterBraceletId}
                 />
-                <Stack.Screen name="SignUp" component={SignUp} /> 
+                <Stack.Screen name="SignUp" component={SignUp} />
                 <Stack.Screen
                   name="CreateBabyAccount"
                   component={CreateBabyAccount}
