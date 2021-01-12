@@ -65,7 +65,7 @@ export default function App() {
     return (
       <UserContext.Provider value={appUserContext}>
         <NavigationContainer>
-          <View>
+          {/* <View>
             {!!user ? (
               <Text>
                 Welcome{user._user.email} + {user._user.uid}
@@ -73,7 +73,7 @@ export default function App() {
             ) : (
               <Text>Login</Text>
             )}
-          </View>
+          </View> */}
           <Stack.Navigator
             screenOptions={{
               headerShown: false,
