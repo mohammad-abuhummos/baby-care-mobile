@@ -43,6 +43,7 @@ export default function App() {
   }, [userAuth]);
   useEffect(() => {
     setInitializing(false);
+    setReload(false);
   }, [reload]);
 
   const Stack = createStackNavigator();
