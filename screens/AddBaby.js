@@ -58,6 +58,7 @@ export default function AddBaby({navigation}) {
       .update({babyInfo})
       .then(() => {
         setLoading(false);
+        navigation.navigate('Accounts');
       });
   };
   const currentDate = () => {
