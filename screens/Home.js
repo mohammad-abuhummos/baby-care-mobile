@@ -7,15 +7,11 @@ import {UserContext} from '../App';
 import storage from '@react-native-firebase/storage';
 import {Image} from 'react-native';
 import LoadingIndicator from '../components/LoadingIndicator';
+import Card from '../components/Card';
 export default function Home() {
-  const {
-    babyId,
-    user,
-    setBabyId,
-    setBracelet,
-    bracelet,
-
-  } = React.useContext(UserContext);
+  const {babyId, user, setBabyId, setBracelet, bracelet} = React.useContext(
+    UserContext,
+  );
   const [invoked, setInvoked] = React.useState(null);
   const [isBracelet, setIsBracelet] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
@@ -29,7 +25,6 @@ export default function Home() {
         .ref(`users/${user.uid}/baby/${babyId}`)
         .getDownloadURL();
       setBabyImage(url);
-      // console.log('url:', url);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -41,7 +36,6 @@ export default function Home() {
       .ref(`users/${user.uid}/baby/${babyId}/babyInfo`)
       .on('value', (snapshot) => {
         setCurrnetBaby(snapshot.val());
-        // console.log('getBabyInfo', snapshot.val());
       });
     return () =>
       database()
@@ -54,7 +48,7 @@ export default function Home() {
       .ref(`users/${user.uid}/bracletId/`)
       .on('value', (snapshot) => {
         setBracelet(snapshot.val());
-          setIsBracelet(true);
+        setIsBracelet(true);
         console.log('setBracelet', snapshot.val());
       });
     return () =>
@@ -66,7 +60,7 @@ export default function Home() {
       .on('value', (snapshot) => {
         setBabyId(snapshot.val());
         setInvoked(true);
-        console.log("getBabyId",snapshot.val())
+        console.log('getBabyId', snapshot.val());
       });
 
     return () =>
@@ -76,13 +70,13 @@ export default function Home() {
     getBraceletId();
   }, []);
   React.useEffect(() => {
-    console.log("braceletbracelet",!!bracelet)
+    console.log('braceletbracelet', !!bracelet);
     if (!!bracelet) {
       getBabyId();
     }
   }, [isBracelet]);
-  
-  React.useEffect(() => { 
+
+  React.useEffect(() => {
     getBabyImage();
     getBabyInfo();
   }, [invoked]);
@@ -97,14 +91,14 @@ export default function Home() {
   }, [invoked]);
 
   React.useEffect(() => {
-    // if (!!user) {
-    //   if ((!!currnetSign && currnetSign.bpm === 0) || currnetSign.SpO2 === 0) {
-    //     setDialogVal({visible: true});
-    //   } else {
-    //     setDialogVal({visible: false});
-    //   }
-    // }
-  }, []);
+    if (!!user) {
+      if (!!currnetSign && !!currnetSign.bpm === 0) {
+        setDialogVal({visible: true});
+      } else {
+        setDialogVal({visible: false});
+      }
+    }
+  }, [currnetSign]);
   if (loading) {
     return <LoadingIndicator />;
   } else {
@@ -115,12 +109,48 @@ export default function Home() {
           paddingHorizontal: 20,
         }}>
         <View style={{paddingTop: 30, width: '100%'}}>
-          <Image />
           <BabyInfoCard
             name={!!currnetBaby && currnetBaby.name}
             img={!!babyImage && {uri: babyImage}}
             color="#fff"
+            status={true}
           />
+          {/* {!!currnetBaby ? (
+            <BabyInfoCard
+              name={!!currnetBaby && currnetBaby.name}
+              img={!!babyImage && {uri: babyImage}}
+              color="#fff"
+              status={true}
+            />
+          ) : (
+            <Card>
+              <View style={{flexDirection: 'row', width: '100%', height: 90}}>
+                <View
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: '100%',
+                  }}>
+                  <Text
+                    style={{
+                      fontWeight: 'bold',
+                      fontSize: 20,
+                      color: '#838487',
+                    }}>
+                    Add Baby Account
+                  </Text>
+                  <Text
+                    style={{
+                      fontWeight: 'bold',
+                      fontSize: 50,
+                      color: '#838487',
+                    }}>
+                    +
+                  </Text>
+                </View>
+              </View>
+            </Card>
+          )} */}
         </View>
         <View style={{paddingTop: 15, width: '100%'}}>
           <VitalSignsCard
