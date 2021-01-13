@@ -3,7 +3,7 @@ import {Text, View} from 'react-native';
 import Dialog, {DialogContent} from 'react-native-popup-dialog';
 import {VitalSignsCard, BabyInfoCard} from '../components/VitalSignsCard';
 import database from '@react-native-firebase/database';
-import {UserContext} from '../App';
+import {UserContext} from '../context/AppContext';
 import storage from '@react-native-firebase/storage';
 import {Image} from 'react-native';
 import LoadingIndicator from '../components/LoadingIndicator';
