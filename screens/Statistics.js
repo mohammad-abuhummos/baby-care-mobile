@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import Button from '../components/Button';
-import {UserContext} from '../App';
+import { UserContext } from '../context/AppContext';
 import database from '@react-native-firebase/database';
 import LabelAndText from '../components/LabelAndText';
 import {LineChart} from 'react-native-chart-kit';

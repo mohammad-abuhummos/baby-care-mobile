@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import Button from '../components/Button';
-import {UserContext} from '../App';
+import { UserContext } from '../context/AppContext';
 import database from '@react-native-firebase/database';
 import LabelAndText from '../components/LabelAndText';
 import LoadingIndicator from '../components/LoadingIndicator';
@@ -25,15 +25,17 @@ export default function BabyProfile({route, navigation}) {
 
   const parms = route.params;
 
-  const Updatebarclet = () => {
-    database()
-      .ref(`${bracelet}`)
-      .update({babyId: `${parms.id}`, userId: `${user.uid}`})
-      .then(() => {
-        setInitializing(true);
-        setReload(true);
-        // navigation.navigate('Home');
-      });
+  const Updatebarclet = async () => {
+    try {
+      await database()
+        .ref(`${bracelet}`)
+        .update({babyId: `${parms.id}`, userId: `${user.uid}`})
+        .then(() => {
+          // navigation.navigate('Home');
+          setInitializing(true);
+          setReload(true);
+        });
+    } catch (error) {}
   };
 
   const CalculateAge = (birthday) => {

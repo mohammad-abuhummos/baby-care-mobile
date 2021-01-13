@@ -188,6 +188,15 @@ dependencies {
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
 
+
+implementation project(':react-native-firebase')
+implementation "com.google.android.gms:play-services-base:16.1.0"
+implementation "com.google.firebase:firebase-core:16.0.9"
+implementation "com.google.firebase:firebase-config:17.0.0"
+implementation "com.google.firebase:firebase-invites:17.0.0"
+implementation "com.google.firebase:firebase-messaging:18.0.0"
+implementation "me.leolin:ShortcutBadger:1.1.21@aar"
+
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
       exclude group:'com.facebook.fbjni'
     }

@@ -12,7 +12,7 @@ import {
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import Button from '../components/Button';
 import AppInput from '../components/AppInput';
-import {UserContext} from '../App';
+import { UserContext } from '../context/AppContext';
 import database from '@react-native-firebase/database';
 import DatePicker from 'react-native-datepicker';
 import RadioButtonRN from 'radio-buttons-react-native';

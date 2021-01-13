@@ -6,8 +6,8 @@
  * @flow strict-local
  */
 import 'react-native-gesture-handler';
-import React, {useState, useEffect} from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import React, {Fragment, useState, useEffect} from 'react';
+import {StyleSheet, Text, View, Alert} from 'react-native';
 // import WelcomeScreen from './screens/WelcomeScreen';
 import SignIn from './screens/Auth/SignIn';
 import SignUp from './screens/Auth/SignUp';
@@ -15,12 +15,14 @@ import CompleteSignUp from './screens/Auth/CompleteSignUp';
 import {NavigationContainer, DrawerItems} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import auth from '@react-native-firebase/auth';
+import firebase from 'react-native-firebase';
 import CreateBabyAccount from './screens/Auth/CreateBabyAccount';
 import LoadingIndicator from './components/LoadingIndicator';
 import AppDrawer from './roots/Drawer';
 import EnterBraceletId from './screens/Auth/EnterBraceletId';
-export const UserContext = React.createContext();
-
+import {UserContext} from './context/AppContext';
+import messaging from '@react-native-firebase/messaging';
+firebase;
 export default function App() {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState(null);
@@ -29,6 +31,7 @@ export default function App() {
   const [bracelet, setBracelet] = useState(null);
   const [braceletIds, setBraceletIds] = useState(null);
   const [reload, setReload] = useState(null);
+  const [isSignUp, setIsSignUp] = useState(true);
 
   function onAuthStateChanged(user) {
     setUser(user);
@@ -38,12 +41,112 @@ export default function App() {
     if (initializing) setInitializing(false);
   }
   useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber; // unsubscribe on unmount
+    if (!!isSignUp) {
+      const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+      return subscriber; // unsubscribe on unmount
+    }
   }, [userAuth]);
   useEffect(() => {
     setInitializing(false);
+    setReload(false);
   }, [reload]);
+
+  // const RE = async() =>{
+  //   try {
+  //   const reg =  await  messaging()
+  //     .registerDeviceForRemoteMessages()
+  //     .then(rsss => {
+  //       console.log("registerDeviceForRemoteMessagesResss------",ress);
+  //     });
+  //     console.log("registerDeviceForRemoteMessagesResss------",reg);
+  //   } catch (error) {
+
+  //   }
+  // }
+
+  //   const hi= async () =>{
+  //     try {
+  //     const defaultAppMessaging = firebase.messaging();
+  //     const notTok = await messaging().isDeviceRegisteredForRemoteMessages();
+  //     console.log("defaultAppMessaging",notTok)
+  //   } catch (error) {
+  //     console.log("e---",error)
+  //   }
+  // }
+  // hi()
+
+  useEffect(() => {
+    this.checkPermission();
+    this.messageListener();
+  }, []);
+  getFcmToken = async () => {
+    const fcmToken = await firebase.messaging().getToken();
+    if (fcmToken) {
+      console.log(fcmToken);
+      this.showAlert('Your Firebase Token is:', fcmToken);
+    } else {
+      this.showAlert('Failed', 'No token received');
+    }
+  };
+  checkPermission = async () => {
+    const enabled = await firebase.messaging().hasPermission();
+    if (enabled) {
+      this.getFcmToken();
+    } else {
+      this.requestPermission();
+    }
+  };
+  requestPermission = async () => {
+    try {
+      await firebase.messaging().requestPermission();
+      // User has authorised
+    } catch (error) {
+      // User has rejected permissions
+    }
+  };
+  messageListener = async () => {
+    this.notificationListener = firebase
+      .notifications()
+      .onNotification((notification) => {
+        const {title, body} = notification;
+        this.showAlert(title, body);
+      });
+
+    this.notificationOpenedListener = firebase
+      .notifications()
+      .onNotificationOpened((notificationOpen) => {
+        const {title, body} = notificationOpen.notification;
+        this.showAlert(title, body);
+      });
+
+    const notificationOpen = await firebase
+      .notifications()
+      .getInitialNotification();
+    if (notificationOpen) {
+      const {title, body} = notificationOpen.notification;
+      this.showAlert(title, body);
+    }
+
+    this.messageListener = firebase.messaging().onMessage((message) => {
+      console.log(JSON.stringify(message));
+    });
+  };
+  showAlert = (title, message) => {
+    Alert.alert(
+      title,
+      message,
+      [{text: 'OK', onPress: () => console.log('OK Pressed')}],
+      {cancelable: false},
+    );
+  };
+  // useEffect(() => {
+  //   messaging()
+  //   .getToken()
+  //   .then(token => {
+  //    console.log("DeviceToken------",token)
+  //   })
+  //   // RE()
+  // }, []);
 
   const Stack = createStackNavigator();
   const appUserContext = {
@@ -58,6 +161,7 @@ export default function App() {
     setUserAuth,
     setBabyId,
     setBraceletIds,
+    setIsSignUp,
   };
   if (initializing) {
     return <LoadingIndicator />;
@@ -65,7 +169,7 @@ export default function App() {
     return (
       <UserContext.Provider value={appUserContext}>
         <NavigationContainer>
-          {/* <View>
+          <View>
             {!!user ? (
               <Text>
                 Welcome{user._user.email} + {user._user.uid}
@@ -73,7 +177,7 @@ export default function App() {
             ) : (
               <Text>Login</Text>
             )}
-          </View> */}
+          </View>
           <Stack.Navigator
             screenOptions={{
               headerShown: false,
