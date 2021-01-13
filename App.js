@@ -19,7 +19,7 @@ import CreateBabyAccount from './screens/Auth/CreateBabyAccount';
 import LoadingIndicator from './components/LoadingIndicator';
 import AppDrawer from './roots/Drawer';
 import EnterBraceletId from './screens/Auth/EnterBraceletId';
-export const UserContext = React.createContext();
+import {UserContext} from './context/AppContext';
 
 export default function App() {
   const [initializing, setInitializing] = useState(true);
@@ -29,17 +29,20 @@ export default function App() {
   const [bracelet, setBracelet] = useState(null);
   const [braceletIds, setBraceletIds] = useState(null);
   const [reload, setReload] = useState(null);
+  const [isSignUp, setIsSignUp] = useState(true);
 
   function onAuthStateChanged(user) {
     setUser(user);
     if (!!user) {
-      setUserAuth(true);
+      setUserAuth(true); 
     }
     if (initializing) setInitializing(false);
   }
   useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-    return subscriber; // unsubscribe on unmount
+    if (!!isSignUp) {
+      const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+      return subscriber; // unsubscribe on unmount
+    }
   }, [userAuth]);
   useEffect(() => {
     setInitializing(false);
@@ -59,6 +62,7 @@ export default function App() {
     setUserAuth,
     setBabyId,
     setBraceletIds,
+    setIsSignUp,
   };
   if (initializing) {
     return <LoadingIndicator />;
@@ -66,7 +70,7 @@ export default function App() {
     return (
       <UserContext.Provider value={appUserContext}>
         <NavigationContainer>
-          {/* <View>
+          <View>
             {!!user ? (
               <Text>
                 Welcome{user._user.email} + {user._user.uid}
@@ -74,7 +78,7 @@ export default function App() {
             ) : (
               <Text>Login</Text>
             )}
-          </View> */}
+          </View>
           <Stack.Navigator
             screenOptions={{
               headerShown: false,

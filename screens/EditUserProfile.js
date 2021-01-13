@@ -12,7 +12,7 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import Button from '../components/Button';
 import AppInput from '../components/AppInput';
 import LoadingIndicator from '../components/LoadingIndicator';
-import {UserContext} from '../App';
+import { UserContext } from '../context/AppContext';
 import database, {firebase} from '@react-native-firebase/database';
 
 const windowHeight = Dimensions.get('window').height;

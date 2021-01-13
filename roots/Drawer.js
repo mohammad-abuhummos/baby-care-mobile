@@ -8,7 +8,7 @@ import {
 import Home from '../screens/Home';
 import Statistics from '../screens/Statistics';
 import ProfileStack from '../roots/Profile';
-import {UserContext} from '../App';
+import { UserContext } from '../context/AppContext';
 import auth from '@react-native-firebase/auth';
 import BabyStack from './Baby';
 import BabyAccounts from '../screens/BabyAccounts';
@@ -22,8 +22,9 @@ export default function AppDrawer() {
     setInitializing(true);
     auth()
       .signOut()
-      .then(() => {setUser(null)
+      .then(() => {
         setUserAuth(false);
+        setUser(null);
       });
   };
   function CustomDrawerContentComponent(props) {
