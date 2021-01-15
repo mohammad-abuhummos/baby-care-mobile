@@ -35,25 +35,26 @@ export default function EditUserProfile({navigation}) {
   const [lastName, setLastName] = React.useState('');
   const [phone, setPhone] = React.useState('');
   const handleInfo = async () => {
+    setLoading(true);
     let id = `/users/${user.uid}/info`;
     const UserFirebase = id.toString();
-    console.log('UserFirebase', UserFirebase);
     let task = await firebase
       .database()
       .ref(UserFirebase)
       .update({
-        Firstname: firstName,
-        Lastname: lastName,
-        Phone: phone,
-        Email: user._user.email,
+        firstname: firstName,
+        lastname: lastName,
+        phone: phone,
+        email: user.email,
       })
       .then(() => {
+        setLoading(false);
         navigation.goBack();
       });
     try {
-      setLoading(true);
+
       task;
-      setLoading(false);
+    
     } catch (err) {
       console.log(err);
     }
