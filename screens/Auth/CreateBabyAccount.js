@@ -12,52 +12,112 @@ import {
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import Button from '../../components/Button';
 import AppInput from '../../components/AppInput';
-import {UserContext} from '../../App';
+import {UserContext} from '../../context/AppContext';
 import database from '@react-native-firebase/database';
 import DatePicker from 'react-native-datepicker';
 import RadioButtonRN from 'radio-buttons-react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
 import LoadingIndicator from '../../components/LoadingIndicator';
+import { makeid } from '../../utils/string';
 
 export default function CreateBabyAccount({navigation}) {
-  const {user, setUserAuth, bracelet ,setBabyId} = React.useContext(UserContext);
+  const {
+    user,
+    setUserAuth,
+    bracelet,
+    setBabyId,
+    setIsSignUp,
+    babyId,
+  } = React.useContext(UserContext);
   const [loading, setLoading] = React.useState(false);
   const [uploading, setUploading] = React.useState(false);
-  const currentDate = () => {
-    return new Date().toJSON().slice(0, 10).replace(/-/g, '-');
-  };
-  const [image, setImage] = React.useState(null);
-  console.log('image:', image);
+  const [image, setImage] = React.useState(null); 
   const [name, setName] = React.useState('');
   const [date, setDate] = React.useState('2016-05-15');
   const [gender, setGender] = React.useState('Female');
+  const [imageUrl, setImageUrl] = React.useState(null);
+  const [id, gitId] = React.useState(true);
+
+  console.log('babyId-----------', babyId);
+  React.useEffect(() => {
+    if (!!id) {
+      setBabyId(makeid(12));
+      gitId(false)
+    }
+  }, [imageUrl]);
+  React.useEffect(() => {
+    if (!!imageUrl) {
+      updateImge();
+    }
+  }, [imageUrl]);
+  const getBabyImage = async () => {
+    try {
+      const url = await storage().ref(`/babys/${babyId}/`).getDownloadURL();
+      setImageUrl(url);
+    } catch (error) {
+      setLoading(false);
+    }
+  };
+  const updateImge = () => {
+    const babyInfo = {
+      name: name,
+      date: date,
+      gender: gender,
+      img: imageUrl,
+    };
+    database()
+      .ref(`/babys/${babyId}/`)
+      .update({babyInfo})
+      .then(() => {
+        setLoading(false);
+        setIsSignUp(true);
+        setUserAuth(true);
+      });
+  };
+
+  const currentDate = () => {
+    return new Date().toJSON().slice(0, 10).replace(/-/g, '-');
+  };
   const handleInfo = () => {
+
     setLoading(true);
+
     const babyInfo = {
       name: name,
       date: date,
       gender: gender,
     };
     database()
-      .ref(`/users/${user._user.uid}/baby/${user._user.uid}${name}/`)
+      .ref(`/babys/${babyId}`)
       .set({babyInfo})
       .then(() => {
-        setBabyId(`${user._user.uid}${name}`)
+        addRefBaby();
+        updateUserIdBaby();
         Updatebarclet();
         uploadImage(image);
       });
   };
+
+  const addRefBaby = () => {
+    const newReference = database().ref(`/users/${user.uid}/baby/`).push();
+    newReference.set({id: `${babyId}`}).then(() => {});
+  };
+  const updateUserIdBaby = () => {
+    database()
+      .ref(`/users/${user.uid}/currentbaby`)
+      .set({currentbaby: `${babyId}`})
+      .then(() => {});
+  };
+
   const Updatebarclet = () => {
     database()
       .ref(`${bracelet}`)
       .update({
-        babyId: `${user._user.uid}${name}`,
-        userId: `${user._user.uid}`,
+        babyId: `${babyId}`,
+        userId: `${user.uid}`,
       })
-      .then(() => {
-
-      });
+      .then(() => {});
   };
   const data = [
     {
@@ -85,7 +145,7 @@ export default function CreateBabyAccount({navigation}) {
   };
 
   const uploadImage = async (uri) => {
-    const fileKey = `/users/${user._user.uid}/baby/${user._user.uid}${name}/`;
+    const fileKey = `/babys/${babyId}/`;
     const uploadUri = uri;
     setUploading(true);
     setLoading(true);
@@ -97,11 +157,7 @@ export default function CreateBabyAccount({navigation}) {
     }
     setUploading(false);
     setLoading(true);
-    setUserAuth(true);
-    // Alert.alert(
-    //   'Photo uploaded!',
-    //   'Your photo has been uploaded to Firebase Cloud Storage!',
-    // );
+    getBabyImage();
   };
   if (!!loading) {
     return <LoadingIndicator />;

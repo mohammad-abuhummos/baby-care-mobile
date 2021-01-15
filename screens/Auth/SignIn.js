@@ -14,8 +14,9 @@ import UserSignIn from '../../models/UserSignIn';
 import {displayError} from '../../models/helpers';
 import auth from '@react-native-firebase/auth';
 import LoadingIndicator from '../../components/LoadingIndicator';
-
+import { UserContext } from '../../context/AppContext';
 export default function SignInScreen({navigation}) {
+  const {setIsSignUp,setUserAuth} = React.useContext(UserContext);
   const [loading, setLoading] = React.useState(false);
   const [Email, setEmail] = React.useState();
   const [Password, setPassword] = React.useState();
@@ -30,6 +31,7 @@ export default function SignInScreen({navigation}) {
       auth()
         .signInWithEmailAndPassword(email, password)
         .then(() => {
+          setLoading(false);
           console.log('User account created & signed in!');
         })
         .catch((error) => {
@@ -103,7 +105,10 @@ export default function SignInScreen({navigation}) {
             <View style={{paddingTop: 30}}>
               <Button
                 title="Sign up"
-                onPress={() => navigation.navigate('EnterBraceletId')}
+                onPress={() => {
+                  setIsSignUp(false)
+                  navigation.navigate('EnterBraceletId')
+                }}
               />
             </View>
           </View>
