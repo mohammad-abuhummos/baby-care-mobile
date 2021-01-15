@@ -19,7 +19,6 @@ const Drawer = createDrawerNavigator();
 export default function AppDrawer() {
   const {setInitializing, setUser,setUserAuth} = React.useContext(UserContext);
   const signOut = () => {
-    setInitializing(true);
     auth()
       .signOut()
       .then(() => {
