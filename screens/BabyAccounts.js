@@ -9,23 +9,69 @@ import {
 } from 'react-native';
 import {BabyInfoCard} from '../components/VitalSignsCard';
 import database from '@react-native-firebase/database';
-import { UserContext } from '../context/AppContext';
+import {UserContext} from '../context/AppContext';
 import Card from '../components/Card';
 export default function BabyAccounts({navigation}) {
   const {babyId, user} = React.useContext(UserContext);
   const [Baby, setBaby] = React.useState([]);
+  const [userbaby, setUserbaby] = React.useState([]);
   React.useEffect(() => {
     const onValueChange = database()
       .ref(`users/${user.uid}/baby/`)
       .on('value', (snapshot) => {
         setBaby(snapshot.val());
+        console.log('bbb', Baby);
       });
-
     return () =>
       database().ref(`users/${user.uid}`).off('value', onValueChange);
   }, []);
+  var arr =[]
 
-  React.useEffect(() => {}, []);
+  React.useEffect(() => {
+    Object.keys(Baby).map((key) => {
+      // let key = key;
+      let id = Baby[key].id;
+      const onValueChange = database()
+        .ref(`/babys/${id}`)
+        .on('value', (snapshot) => {
+          console.log('babys', snapshot.val());
+        arr.push(snapshot.val())
+        });
+      return () =>
+        database().ref(`/babys/${id}`).off('value', onValueChange);
+    });
+  }, [Baby]);
+  console.log("arr",arr)
+  const fitehkeys = () => {
+    return Object.keys(babys).map((key) => {
+      let id = key;
+      let info = babys[key].babyInfo;
+      let parms = {
+        id: id,
+        info: info,
+      };
+      return (
+        <TouchableOpacity
+          key={id}
+          onPress={() => {
+            navigation.navigate('BabyProfile', parms);
+          }}>
+          <View style={{paddingTop: 30, width: '100%'}}>
+            <BabyInfoCard
+              name={!!info && info.name}
+              img={
+                info.img
+                  ? {uri: info.img}
+                  : require('../assets/profile-icon.png')
+              }
+              color="#fff"
+              status={babyId === id}
+            />
+          </View>
+        </TouchableOpacity>
+      );
+    });
+  };
 
   const RenderBaby = (babys) => {
     return Object.keys(babys).map((key) => {
@@ -43,9 +89,9 @@ export default function BabyAccounts({navigation}) {
           }}>
           <View style={{paddingTop: 30, width: '100%'}}>
             <BabyInfoCard
-              name={info.name}
+              name={!!info && info.name}
               img={
-                !!info.img
+                info.img
                   ? {uri: info.img}
                   : require('../assets/profile-icon.png')
               }
@@ -65,7 +111,7 @@ export default function BabyAccounts({navigation}) {
             flex: 1,
             padding: 20,
           }}>
-          {RenderBaby(Baby)}
+          {/* {RenderBaby(Baby)} */}
           <View style={{paddingTop: 30, width: '100%'}}>
             <TouchableOpacity onPress={() => navigation.navigate('AddBaby')}>
               <Card>
