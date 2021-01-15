@@ -19,7 +19,7 @@ export default function UserProfile({navigation}) {
   const [userProfile, setuserProfile] = React.useState();
   React.useEffect(() => {
     const onValueChange = database()
-      .ref(`/users/${user._user.uid}/info`)
+      .ref(`users/${user.uid}/info`)
       .on('value', (snapshot) => {
         setuserProfile(snapshot.val());
         setLoading(false);
@@ -48,25 +48,25 @@ export default function UserProfile({navigation}) {
           <View style={{paddingTop: 10}}>
             <LabelAndText
               label="First Name"
-              text={!!userProfile && userProfile.Firstname}
+              text={!!userProfile && userProfile.firstname}
             />
           </View>
           <View style={{paddingTop: 10}}>
             <LabelAndText
               label="laste Name"
-              text={!!userProfile && userProfile.Lastname}
+              text={!!userProfile && userProfile.lastname}
             />
           </View>
           <View style={{paddingTop: 10}}>
             <LabelAndText
               label="Phone Number"
-              text={!!userProfile && userProfile.Phone}
+              text={!!userProfile && userProfile.phone}
             />
           </View>
           <View style={{paddingTop: 10}}>
             <LabelAndText
               label="Email"
-              text={!!userProfile && userProfile.Email}
+              text={!!userProfile && userProfile.email}
             />
           </View>
 
