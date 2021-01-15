@@ -64,7 +64,7 @@ export function BabyInfoCard(props) {
               style={{
                 width: 100,
                 height: 100,
-                borderRadius: 100,
+                borderRadius: 200,
                 resizeMode: 'center',
               }}
             />
