@@ -2,38 +2,32 @@ import React from 'react';
 import {Text, View} from 'react-native';
 import Dialog, {DialogContent} from 'react-native-popup-dialog';
 import {VitalSignsCard, BabyInfoCard} from '../components/VitalSignsCard';
-import database from '@react-native-firebase/database';
+import database, {firebase} from '@react-native-firebase/database';
 import {UserContext} from '../context/AppContext';
 import storage from '@react-native-firebase/storage';
 import {Image} from 'react-native';
 import LoadingIndicator from '../components/LoadingIndicator';
 import Card from '../components/Card';
+
 export default function Home() {
-  const {babyId, user, setBabyId, setBracelet, bracelet} = React.useContext(
-    UserContext,
-  );
+  const {
+    babyId,
+    user,
+    setBabyId,
+    setBracelet,
+    bracelet,
+    setnotificationToken,
+  } = React.useContext(UserContext);
   const [invoked, setInvoked] = React.useState(null);
   const [isBracelet, setIsBracelet] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
-  const [babyImage, setBabyImage] = React.useState(null);
+  const [babyImage, setBabyImage] = React.useState(null); 
   const [currnetSign, setCurrnetSign] = React.useState(0);
   const [currnetBaby, setCurrnetBaby] = React.useState();
   const [DialogVal, setDialogVal] = React.useState({visible: false});
-  const getBabyImage = async () => {
-    try {
-      const url = await storage()
-        .ref(`users/${user.uid}/baby/${babyId}`)
-        .getDownloadURL();
-      setBabyImage(url);
-      setLoading(false);
-    } catch (error) {
-      setLoading(false);
-    }
-  };
-
   const getBabyInfo = () => {
     const onValueChange = database()
-      .ref(`users/${user.uid}/baby/${babyId}/babyInfo`)
+      .ref(`babys/${babyId}/babyInfo`)
       .on('value', (snapshot) => {
         setCurrnetBaby(snapshot.val());
       });
@@ -77,9 +71,10 @@ export default function Home() {
   }, [isBracelet]);
 
   React.useEffect(() => {
-    getBabyImage();
     getBabyInfo();
-  }, [invoked]);
+    setLoading(false);
+  }, [babyId]);
+
 
   React.useEffect(() => {
     const onValueChange = database()
@@ -111,7 +106,7 @@ export default function Home() {
         <View style={{paddingTop: 30, width: '100%'}}>
           <BabyInfoCard
             name={!!currnetBaby && currnetBaby.name}
-            img={!!babyImage && {uri: babyImage}}
+            img={!!currnetBaby && {uri: currnetBaby.img}}
             color="#fff"
             status={true}
           />
