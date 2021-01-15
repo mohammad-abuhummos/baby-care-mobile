@@ -12,25 +12,34 @@ import {
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import Button from '../components/Button';
 import AppInput from '../components/AppInput';
-import { UserContext } from '../context/AppContext';
+import {UserContext} from '../context/AppContext';
 import database from '@react-native-firebase/database';
 import DatePicker from 'react-native-datepicker';
 import RadioButtonRN from 'radio-buttons-react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
 import LoadingIndicator from '../components/LoadingIndicator';
-
+import {makeid} from '../utils/string';
 export default function AddBaby({navigation}) {
   const {user} = React.useContext(UserContext);
   const [loading, setLoading] = React.useState(false);
   const [uploading, setUploading] = React.useState(false);
   const [image, setImage] = React.useState(false);
   const [imageUrl, setImageUrl] = React.useState(null);
+  const [id, gitId] = React.useState(true);
+  const [babyId, setnewId] = React.useState(true);
   console.log('image:', image);
   console.log('imageURURl:', imageUrl);
   const [name, setName] = React.useState('');
   const [date, setDate] = React.useState('2016-05-15');
   const [gender, setGender] = React.useState('Female');
+
+  React.useEffect(() => {
+    if (!!id) {
+      setnewId(makeid(12));
+      gitId(false);
+    }
+  }, [imageUrl]);
   React.useEffect(() => {
     if (!!imageUrl) {
       updateImge();
@@ -38,9 +47,7 @@ export default function AddBaby({navigation}) {
   }, [imageUrl]);
   const getBabyImage = async () => {
     try {
-      const url = await storage()
-        .ref(`/users/${user._user.uid}/baby/${user._user.uid}${name}/`)
-        .getDownloadURL();
+      const url = await storage().ref(`/babys/${babyId}/`).getDownloadURL();
       setImageUrl(url);
     } catch (error) {
       setLoading(false);
@@ -54,7 +61,7 @@ export default function AddBaby({navigation}) {
       img: imageUrl,
     };
     database()
-      .ref(`/users/${user._user.uid}/baby/${user._user.uid}${name}/`)
+      .ref(`/babys/${babyId}/`)
       .update({babyInfo})
       .then(() => {
         setLoading(false);
@@ -73,12 +80,19 @@ export default function AddBaby({navigation}) {
       img: image,
     };
     database()
-      .ref(`/users/${user._user.uid}/baby/${user._user.uid}${name}/`)
+      .ref(`/babys/${babyId}`)
       .set({babyInfo})
       .then(() => {
+        addRefBaby();
         uploadImage(image).then(() => getBabyImage());
       });
   };
+
+  const addRefBaby = () => {
+    const newReference = database().ref(`/users/${user.uid}/baby/`).push();
+    newReference.set({id: `${babyId}`}).then(() => {});
+  };
+
   const data = [
     {
       label: 'Female',
@@ -105,7 +119,7 @@ export default function AddBaby({navigation}) {
   };
 
   const uploadImage = async (uri) => {
-    const fileKey = `/users/${user._user.uid}/baby/${user._user.uid}${name}/`;
+    const fileKey = `/babys/${babyId}/`;
     const uploadUri = uri;
     setUploading(true);
     setLoading(true);
