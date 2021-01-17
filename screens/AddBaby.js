@@ -28,7 +28,8 @@ export default function AddBaby({navigation}) {
   const [imageUrl, setImageUrl] = React.useState(null);
   const [id, gitId] = React.useState(true);
   const [babyId, setnewId] = React.useState(true);
-  console.log('image:', image);
+  const [updeated, useupdated] = React.useState(false);
+  // console.log('image:', image);
   console.log('imageURURl:', imageUrl);
   const [name, setName] = React.useState('');
   const [date, setDate] = React.useState('2016-05-15');
@@ -39,35 +40,31 @@ export default function AddBaby({navigation}) {
       setnewId(makeid(12));
       gitId(false);
     }
-  }, [imageUrl]);
-  React.useEffect(() => {
-    if (!!imageUrl) {
-      updateImge();
-    }
-  }, [imageUrl]);
-  const getBabyImage = async () => {
-    try {
-      const url = await storage().ref(`/babys/${babyId}/`).getDownloadURL();
-      setImageUrl(url);
-    } catch (error) {
-      setLoading(false);
-    }
-  };
-  const updateImge = () => {
-    const babyInfo = {
-      name: name,
-      date: date,
-      gender: gender,
-      img: imageUrl,
-    };
-    database()
-      .ref(`/babys/${babyId}/`)
-      .update({babyInfo})
-      .then(() => {
-        setLoading(false);
-        navigation.navigate('Accounts');
-      });
-  };
+  }, []);
+  // React.useEffect(() => {
+  //   if (!!imageUrl) {
+  //     () =>
+  //       updateImge().then(() => setLoading(false)).then(() => navigation.goBack());
+  //   }
+  // }, [imageUrl]);
+  // const getBabyImage = async () => {
+  //   try {
+  //     const url = await storage().ref(`/babys/${babyId}/`).getDownloadURL();
+  //     setImageUrl(url);
+  //   } catch (error) {
+  //     // setLoading(false);
+  //   }
+  // };
+  // const updateImge = () => {
+  //   const babyInfo = {
+  //     name: name,
+  //     date: date,
+  //     gender: gender,
+  //     img: imageUrl,
+  //     id: babyId,
+  //   };
+  //   database().ref(`/babys/${babyId}/`).update({babyInfo});
+  // };
   const currentDate = () => {
     return new Date().toJSON().slice(0, 10).replace(/-/g, '-');
   };
@@ -78,13 +75,20 @@ export default function AddBaby({navigation}) {
       date: date,
       gender: gender,
       img: image,
+      id: babyId,
     };
     database()
       .ref(`/babys/${babyId}`)
       .set({babyInfo})
       .then(() => {
         addRefBaby();
-        uploadImage(image).then(() => getBabyImage());
+        if (!!image) {
+          uploadImage(image).then(() => setLoading(false)).then(() => navigation.goBack());
+          
+        } else {
+          setLoading(false)
+           navigation.goBack()
+        }
       });
   };
 
@@ -122,12 +126,10 @@ export default function AddBaby({navigation}) {
     const fileKey = `/babys/${babyId}/`;
     const uploadUri = uri;
     setUploading(true);
-    setLoading(true);
     const task = storage().ref(fileKey).putFile(uploadUri);
     try {
       await task.then();
     } catch (e) {
-      setLoading(false);
       console.error(e);
     }
     setUploading(false);
@@ -138,7 +140,7 @@ export default function AddBaby({navigation}) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <View style={{position: 'absolute', top: 10, left: 20}}>
+        {/* <View style={{position: 'absolute', top: 10, left: 20}}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Image
               source={require('../assets/back-icon.png')}
@@ -149,7 +151,7 @@ export default function AddBaby({navigation}) {
               }}
             />
           </TouchableOpacity>
-        </View>
+        </View> */}
         <View style={styles.InnerContainer}>
           <View style={{paddingTop: 10}}>
             <TouchableOpacity onPress={pickImage}>
