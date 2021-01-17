@@ -5,8 +5,35 @@ import EditBabyinfo from '../screens/EditBabyinfo';
 import AddBaby from '../screens/AddBaby';
 import BabyProfile from '../screens/BabyProfile';
 const BabyAccounts = createStackNavigator();
+const AddBabyAccounts = createStackNavigator();
 
 
+ function BabynavAccountsStack() {
+  return (
+    <>
+      <AddBabyAccounts.Navigator
+        screenOptions={{
+          headerShown: false,
+        }}>
+    
+        <AddBabyAccounts.Screen
+          name="AddBaby"
+          options={{
+            title: 'Add Baby',
+            headerStyle: {
+              backgroundColor: '#EE979F',
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+              fontWeight: 'bold',
+            },
+          }}
+          component={AddBaby}
+        />
+      </AddBabyAccounts.Navigator>
+    </>
+  );
+}
 export default function BabyAccountsStack() {
   return (
     <>
@@ -40,7 +67,7 @@ export default function BabyAccountsStack() {
               fontWeight: 'bold',
             },
           }}
-          component={AddBaby}
+          component={BabynavAccountsStack}
         />
         <BabyAccounts.Screen
           name="BabyProfile"
