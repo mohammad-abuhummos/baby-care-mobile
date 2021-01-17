@@ -8,7 +8,7 @@ import storage from '@react-native-firebase/storage';
 import {Image} from 'react-native';
 import LoadingIndicator from '../components/LoadingIndicator';
 import Card from '../components/Card';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function Home() {
   const {
     babyId,
@@ -16,7 +16,6 @@ export default function Home() {
     setBabyId,
     setBracelet,
     bracelet,
-    setnotificationToken,
   } = React.useContext(UserContext);
   const [invoked, setInvoked] = React.useState(null);
   const [isBracelet, setIsBracelet] = React.useState(null);
@@ -24,66 +23,90 @@ export default function Home() {
   const [babyImage, setBabyImage] = React.useState(null); 
   const [currnetSign, setCurrnetSign] = React.useState(0);
   const [currnetBaby, setCurrnetBaby] = React.useState();
+  const [notificationToken, setNotificationToken] = React.useState();
   const [DialogVal, setDialogVal] = React.useState({visible: false});
+console.log("babyId",babyId);
+
+  const getfmctoken = async() =>{
+    let fcmToken = await AsyncStorage.getItem('fcmToken');
+    setNotificationToken(fcmToken);
+  }
+  const getBabyId = () => {
+    const onValueChange =
+     database()
+      .ref(`${bracelet}/babyId`)
+      .once('value', (snapshot) => {
+        setBabyId(snapshot.val());
+      })
+      .then(()=>{
+
+      })
+    return () =>
+      database().ref(`${bracelet}/babyId`).off('value', onValueChange);
+  };
+
   const getBabyInfo = () => {
-    const onValueChange = database()
+    const onValueChange =
+     database()
       .ref(`babys/${babyId}/babyInfo`)
-      .on('value', (snapshot) => {
+      .once('value', (snapshot) => {
         setCurrnetBaby(snapshot.val());
       });
     return () =>
       database()
-        .ref(`users/${user.uid}/baby/${babyId}/babyInfo`)
+        .ref(`babys/${babyId}/babyInfo`)
         .off('value', onValueChange);
   };
 
   const getBraceletId = () => {
-    const onValueChange = database()
+    const onValueChange =  database()
       .ref(`users/${user.uid}/bracletId/`)
       .on('value', (snapshot) => {
         setBracelet(snapshot.val());
         setIsBracelet(true);
-        console.log('setBracelet', snapshot.val());
+        // console.log('setBracelet', snapshot.val());
       });
     return () =>
       database().ref(`users/${user.uid}/bracletId`).off('value', onValueChange);
-  };
-  const getBabyId = () => {
-    const onValueChange = database()
-      .ref(`${bracelet}/babyId`)
-      .on('value', (snapshot) => {
-        setBabyId(snapshot.val());
-        setInvoked(true);
-        console.log('getBabyId', snapshot.val());
-      });
-
-    return () =>
-      database().ref(`users/${user.uid}`).off('value', onValueChange);
   };
   React.useEffect(() => {
     getBraceletId();
   }, []);
   React.useEffect(() => {
-    console.log('braceletbracelet', !!bracelet);
+    getfmctoken()
+    console.log("notificationTokenHOme-------------------------",notificationToken)
+        database()
+        .ref(`users/${user.uid}/notificationToken`)
+        .set({notificationToken: notificationToken})
+  }, [notificationToken]);
+  React.useEffect(() => {
+    // console.log('braceletbracelet', !!bracelet);
     if (!!bracelet) {
-      getBabyId();
+      getBabyId()
     }
   }, [isBracelet]);
 
   React.useEffect(() => {
-    getBabyInfo();
-    setLoading(false);
+      getBabyInfo();
+      database()
+      .ref(`babys/${babyId}/users/${user.uid}/`)
+      .set({notificationToken: notificationToken})
+  }, [babyId]);
+  React.useEffect(() => {
+    if (!!babyId) {
+      setLoading(false);
+    }
   }, [babyId]);
 
-
+  // getBabyInfo();
   React.useEffect(() => {
     const onValueChange = database()
-      .ref(`users/${user.uid}/baby/${babyId}/Data`)
+      .ref(`/babys/${babyId}/data`)
       .on('value', (snapshot) => {
         setCurrnetSign(snapshot.val());
       });
-    return () => database().ref(`/Data`).off('value', onValueChange);
-  }, [invoked]);
+    return () => database().ref(`/data`).off('value', onValueChange);
+  }, []);
 
   React.useEffect(() => {
     if (!!user) {
@@ -161,8 +184,8 @@ export default function Home() {
           <VitalSignsCard
             symbols={'%'}
             name="Oxygen level"
-            from={50}
-            to={120}
+            from={94}
+            to={100}
             currnet={!!currnetSign ? Math.ceil(currnetSign.SpO2) : 0}
             color="#fff"
           />
@@ -171,9 +194,9 @@ export default function Home() {
           <VitalSignsCard
             symbols={'C'}
             name="Temp"
-            from={50}
-            to={120}
-            currnet={!!currnetSign ? Math.ceil(currnetSign.temp) : 0}
+            from={36}
+            to={37}
+            currnet={!!currnetSign ? Math.ceil(currnetSign.tempc) : 0}
             color="#fff"
           />
         </View>
