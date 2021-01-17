@@ -8,7 +8,6 @@
 import 'react-native-gesture-handler';
 import React, {Fragment, useState, useEffect} from 'react';
 import {StyleSheet, Text, View, Alert} from 'react-native';
-// import WelcomeScreen from './screens/WelcomeScreen';
 import SignIn from './screens/Auth/SignIn';
 import SignUp from './screens/Auth/SignUp';
 import CompleteSignUp from './screens/Auth/CompleteSignUp';
@@ -21,8 +20,8 @@ import LoadingIndicator from './components/LoadingIndicator';
 import AppDrawer from './roots/Drawer';
 import EnterBraceletId from './screens/Auth/EnterBraceletId';
 import {UserContext} from './context/AppContext';
-import messaging from '@react-native-firebase/messaging';
-firebase;
+import database from '@react-native-firebase/database';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function App() {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState(null);
@@ -32,71 +31,80 @@ export default function App() {
   const [braceletIds, setBraceletIds] = useState(null);
   const [reload, setReload] = useState(null);
   const [isSignUp, setIsSignUp] = useState(true);
+  const [notificationToken, setnotificationToken] = useState(null);
+// console.log("notificationToken",notificationToken)
 
+  // console.log(
+  //   'notificationToken-------',
+  //   notificationToken,
+  //   'isSignUp-------',
+  //   isSignUp,
+  //   'userAuth-------',
+  //   userAuth,
+  //   '----------user',
+  //   user,
+  // );
   function onAuthStateChanged(user) {
-    setUser(user);
-    if (!!user) {
-      setUserAuth(true);
+    if (!!user && isSignUp) {
+      setUser(user);
+      if (initializing) setInitializing(false);
     }
-    if (initializing) setInitializing(false);
   }
   useEffect(() => {
-    if (!!isSignUp) {
-      const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
-      return subscriber; // unsubscribe on unmount
-    }
-  }, [userAuth]);
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
+    return subscriber; // unsubscribe on unmount
+  }, []);
   useEffect(() => {
     setInitializing(false);
     setReload(false);
   }, [reload]);
+  useEffect(() => {
+    if (isSignUp && !!user) {
+      database()
+        .ref(`users/${user.uid}/notificationToken`)
+        .set({notificationToken: notificationToken})
+        .then(() => setUserAuth(true));
+    }
+  }, [user]);
 
-  // const RE = async() =>{
-  //   try {
-  //   const reg =  await  messaging()
-  //     .registerDeviceForRemoteMessages()
-  //     .then(rsss => {
-  //       console.log("registerDeviceForRemoteMessagesResss------",ress);
-  //     });
-  //     console.log("registerDeviceForRemoteMessagesResss------",reg);
-  //   } catch (error) {
-
-  //   }
-  // }
-
-  //   const hi= async () =>{
-  //     try {
-  //     const defaultAppMessaging = firebase.messaging();
-  //     const notTok = await messaging().isDeviceRegisteredForRemoteMessages();
-  //     console.log("defaultAppMessaging",notTok)
-  //   } catch (error) {
-  //     console.log("e---",error)
-  //   }
-  // }
-  // hi()
 
   useEffect(() => {
-    this.checkPermission();
-    this.messageListener();
+    checkPermission();
+    messageListener();
   }, []);
-  getFcmToken = async () => {
-    const fcmToken = await firebase.messaging().getToken();
-    if (fcmToken) {
-      console.log(fcmToken);
-      this.showAlert('Your Firebase Token is:', fcmToken);
-    } else {
-      this.showAlert('Failed', 'No token received');
-    }
+  // const reg = async () => {
+  //   try {
+  //     let register =  firebase.notifications().;
+  //       console.log("registerDeviceForRemoteMessages---",register)
+  //     setnotificationToken(register);
+  //   } catch (error) {
+  //     console.log("registerDeviceForRemoteMessages---",error)
+  //   }
+  //   // if (fcmToken) {
+  //   //   console.log(fcmToken);
+  //   //   showAlert('Your Firebase Token is:', fcmToken);
+  //   // } else {
+  //   //   showAlert('Failed', 'No token received');
+  //   // }
+  // };
+  const getFcmToken = async () => {
+    let fcmToken = await AsyncStorage.getItem('fcmToken');
+    if (!fcmToken) {
+      fcmToken = await firebase.messaging().getToken();
+      if (fcmToken) {
+          await AsyncStorage.setItem('fcmToken', fcmToken);
+      }
+  }
   };
-  checkPermission = async () => {
+  const checkPermission = async () => {
     const enabled = await firebase.messaging().hasPermission();
     if (enabled) {
-      this.getFcmToken();
+      getFcmToken();
     } else {
-      this.requestPermission();
+      requestPermission(); 
     }
   };
-  requestPermission = async () => {
+  const requestPermission = async () => {
     try {
       await firebase.messaging().requestPermission();
       // User has authorised
@@ -105,18 +113,18 @@ export default function App() {
     }
   };
   messageListener = async () => {
-    this.notificationListener = firebase
+    notificationListener = firebase
       .notifications()
       .onNotification((notification) => {
         const {title, body} = notification;
-        this.showAlert(title, body);
+        // showAlert(title, body);
       });
 
-    this.notificationOpenedListener = firebase
+    notificationOpenedListener = firebase
       .notifications()
       .onNotificationOpened((notificationOpen) => {
         const {title, body} = notificationOpen.notification;
-        this.showAlert(title, body);
+        // showAlert(title, body);
       });
 
     const notificationOpen = await firebase
@@ -124,14 +132,14 @@ export default function App() {
       .getInitialNotification();
     if (notificationOpen) {
       const {title, body} = notificationOpen.notification;
-      this.showAlert(title, body);
+      // showAlert(title, body);
     }
 
-    this.messageListener = firebase.messaging().onMessage((message) => {
-      console.log(JSON.stringify(message));
+    messageListener = firebase.messaging().onMessage((message) => {
+      // console.log(JSON.stringify(message));
     });
   };
-  showAlert = (title, message) => {
+  const showAlert = (title, message) => {
     Alert.alert(
       title,
       message,
@@ -169,7 +177,7 @@ export default function App() {
     return (
       <UserContext.Provider value={appUserContext}>
         <NavigationContainer>
-          <View>
+          {/* <View>
             {!!user ? (
               <Text>
                 Welcome{user._user.email} + {user._user.uid}
@@ -177,7 +185,7 @@ export default function App() {
             ) : (
               <Text>Login</Text>
             )}
-          </View>
+          </View> */}
           <Stack.Navigator
             screenOptions={{
               headerShown: false,

@@ -15,32 +15,24 @@ import UserSignUp from '../../models/UserSignUp';
 import {displayError} from '../../models/helpers';
 import auth from '@react-native-firebase/auth';
 import LoadingIndicator from '../../components/LoadingIndicator';
-
+import { UserContext } from '../../context/AppContext';
 export default function SignUpScreen({navigation}) {
+  const {setUserAuth} = React.useContext(UserContext);
   const [loading, setLoading] = React.useState(false);
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [passwordConfirmation, setPasswordConfirmation] = React.useState('');
-  const input = {
-    email: email,
-    password: password,
-    passwordConfirmation: passwordConfirmation,
-  };
-  const SignOutUser = () => {
-    auth()
-      .signOut()
-      .then(() => console.log('User signed out!'));
-  };
   const validate = (email, password, passwordConfirmation) => {
     setLoading(true);
     let sign_up_info = new UserSignUp(email, password, passwordConfirmation);
     if (sign_up_info.isValid()) {
       auth()
         .createUserWithEmailAndPassword(email, password)
-        .then(() => {
+        .then((respon) => {
           setLoading(false);
           navigation.navigate('CompleteSignUp');
           console.log('User account created & signed in!');
+          console.log('set user',respon);
         })
         .catch((error) => {
           setLoading(false);

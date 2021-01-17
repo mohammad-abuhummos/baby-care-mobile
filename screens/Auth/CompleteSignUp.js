@@ -10,29 +10,29 @@ import {
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import Button from '../../components/Button';
 import AppInput from '../../components/AppInput';
-import {UserContext} from '../../App';
+import { UserContext } from '../../context/AppContext';
 import CompleteSignUp from '../../models/CompleteSignUp';
 import {displayError} from '../../models/helpers';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import database from '@react-native-firebase/database';
 export default function CompleteSignUpScreen({navigation}) {
-  const {user} = React.useContext(UserContext);
+  const {user,bracelet} = React.useContext(UserContext);
   const [loading, setLoading] = React.useState(false);
   const [firstname, setFirstname] = React.useState('');
   const [lastname, setLastname] = React.useState('');
-  const [phone, setPhone] = React.useState('');
+  const [phone, setPhone] = React.useState('');  
   const handleInfo = (firstname, lastname, phone) => {
     let User_info = new CompleteSignUp(firstname, lastname, phone);
     if (User_info.isValid()) {
       const info = {
-        Firstname: firstname,
-        Lastname: lastname,
-        Phone: phone,
-        Email: user._user.email,
+        firstname: firstname,
+        lastname: lastname,
+        phone: phone,
+        email: user.email,
       };
       database()
-        .ref(`/users/${user._user.uid}`)
-        .set({info})
+        .ref(`/users/${user.uid}`)
+        .set({bracletId:bracelet,info})
         .then(() => navigation.navigate('CreateBabyAccount'));
     } else {
       setLoading(false);

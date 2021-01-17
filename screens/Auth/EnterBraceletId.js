@@ -12,7 +12,7 @@ import AppInput from '../../components/AppInput';
 import UserSignIn from '../../models/UserSignIn';
 import {displayError} from '../../models/helpers';
 import LoadingIndicator from '../../components/LoadingIndicator';
-import {UserContext} from '../../App';
+import { UserContext } from '../../context/AppContext';
 export default function EnterBraceletId({navigation}) {
   const [loading, setLoading] = React.useState(false);
   const {setBracelet} = React.useContext(UserContext);

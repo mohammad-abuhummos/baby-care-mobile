@@ -12,55 +12,59 @@ import {
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import Button from '../components/Button';
 import AppInput from '../components/AppInput';
-import { UserContext } from '../context/AppContext';
+import {UserContext} from '../context/AppContext';
 import database from '@react-native-firebase/database';
 import DatePicker from 'react-native-datepicker';
 import RadioButtonRN from 'radio-buttons-react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
 import LoadingIndicator from '../components/LoadingIndicator';
-
+import {makeid} from '../utils/string';
 export default function AddBaby({navigation}) {
   const {user} = React.useContext(UserContext);
   const [loading, setLoading] = React.useState(false);
   const [uploading, setUploading] = React.useState(false);
   const [image, setImage] = React.useState(false);
   const [imageUrl, setImageUrl] = React.useState(null);
-  console.log('image:', image);
+  const [id, gitId] = React.useState(true);
+  const [babyId, setnewId] = React.useState(true);
+  const [updeated, useupdated] = React.useState(false);
+  // console.log('image:', image);
   console.log('imageURURl:', imageUrl);
   const [name, setName] = React.useState('');
   const [date, setDate] = React.useState('2016-05-15');
   const [gender, setGender] = React.useState('Female');
+
   React.useEffect(() => {
-    if (!!imageUrl) {
-      updateImge();
+    if (!!id) {
+      setnewId(makeid(12));
+      gitId(false);
     }
-  }, [imageUrl]);
-  const getBabyImage = async () => {
-    try {
-      const url = await storage()
-        .ref(`/users/${user._user.uid}/baby/${user._user.uid}${name}/`)
-        .getDownloadURL();
-      setImageUrl(url);
-    } catch (error) {
-      setLoading(false);
-    }
-  };
-  const updateImge = () => {
-    const babyInfo = {
-      name: name,
-      date: date,
-      gender: gender,
-      img: imageUrl,
-    };
-    database()
-      .ref(`/users/${user._user.uid}/baby/${user._user.uid}${name}/`)
-      .update({babyInfo})
-      .then(() => {
-        setLoading(false);
-        navigation.navigate('Accounts');
-      });
-  };
+  }, []);
+  // React.useEffect(() => {
+  //   if (!!imageUrl) {
+  //     () =>
+  //       updateImge().then(() => setLoading(false)).then(() => navigation.goBack());
+  //   }
+  // }, [imageUrl]);
+  // const getBabyImage = async () => {
+  //   try {
+  //     const url = await storage().ref(`/babys/${babyId}/`).getDownloadURL();
+  //     setImageUrl(url);
+  //   } catch (error) {
+  //     // setLoading(false);
+  //   }
+  // };
+  // const updateImge = () => {
+  //   const babyInfo = {
+  //     name: name,
+  //     date: date,
+  //     gender: gender,
+  //     img: imageUrl,
+  //     id: babyId,
+  //   };
+  //   database().ref(`/babys/${babyId}/`).update({babyInfo});
+  // };
   const currentDate = () => {
     return new Date().toJSON().slice(0, 10).replace(/-/g, '-');
   };
@@ -71,14 +75,28 @@ export default function AddBaby({navigation}) {
       date: date,
       gender: gender,
       img: image,
+      id: babyId,
     };
     database()
-      .ref(`/users/${user._user.uid}/baby/${user._user.uid}${name}/`)
+      .ref(`/babys/${babyId}`)
       .set({babyInfo})
       .then(() => {
-        uploadImage(image).then(() => getBabyImage());
+        addRefBaby();
+        if (!!image) {
+          uploadImage(image).then(() => setLoading(false)).then(() => navigation.goBack());
+          
+        } else {
+          setLoading(false)
+           navigation.goBack()
+        }
       });
   };
+
+  const addRefBaby = () => {
+    const newReference = database().ref(`/users/${user.uid}/baby/`).push();
+    newReference.set({id: `${babyId}`}).then(() => {});
+  };
+
   const data = [
     {
       label: 'Female',
@@ -105,15 +123,13 @@ export default function AddBaby({navigation}) {
   };
 
   const uploadImage = async (uri) => {
-    const fileKey = `/users/${user._user.uid}/baby/${user._user.uid}${name}/`;
+    const fileKey = `/babys/${babyId}/`;
     const uploadUri = uri;
     setUploading(true);
-    setLoading(true);
     const task = storage().ref(fileKey).putFile(uploadUri);
     try {
       await task.then();
     } catch (e) {
-      setLoading(false);
       console.error(e);
     }
     setUploading(false);
@@ -124,7 +140,7 @@ export default function AddBaby({navigation}) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <View style={{position: 'absolute', top: 10, left: 20}}>
+        {/* <View style={{position: 'absolute', top: 10, left: 20}}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Image
               source={require('../assets/back-icon.png')}
@@ -135,7 +151,7 @@ export default function AddBaby({navigation}) {
               }}
             />
           </TouchableOpacity>
-        </View>
+        </View> */}
         <View style={styles.InnerContainer}>
           <View style={{paddingTop: 10}}>
             <TouchableOpacity onPress={pickImage}>
