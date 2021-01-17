@@ -21,6 +21,7 @@ import AppDrawer from './roots/Drawer';
 import EnterBraceletId from './screens/Auth/EnterBraceletId';
 import {UserContext} from './context/AppContext';
 import database from '@react-native-firebase/database';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function App() {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState(null);
@@ -31,6 +32,7 @@ export default function App() {
   const [reload, setReload] = useState(null);
   const [isSignUp, setIsSignUp] = useState(true);
   const [notificationToken, setnotificationToken] = useState(null);
+// console.log("notificationToken",notificationToken)
 
   // console.log(
   //   'notificationToken-------',
@@ -60,60 +62,16 @@ export default function App() {
     if (isSignUp && !!user) {
       database()
         .ref(`users/${user.uid}/notificationToken`)
-        .set({notificationToken: notificationToken});
-      setUserAuth(true);
+        .set({notificationToken: notificationToken})
+        .then(() => setUserAuth(true));
     }
   }, [user]);
-  // useEffect(() => {
-  //   if (!!user) {
-  //     database()
-  //       .ref(`/users/${user.uid}/`)
-  //       .set({notificationToken: notificationToken})
-  //       .then();
-  //   }
-  // }, [notificationToken]);
 
-  // const RE = async() =>{
-  //   try {
-  //   const reg =  await  messaging()
-  //     .registerDeviceForRemoteMessages()
-  //     .then(rsss => {
-  //       console.log("registerDeviceForRemoteMessagesResss------",ress);
-  //     });
-  //     console.log("registerDeviceForRemoteMessagesResss------",reg);
-  //   } catch (error) {
-
-  //   }
-  // }
-
-  //   const hi= async () =>{
-  //     try {
-  //     const defaultAppMessaging = firebase.messaging();
-  //     const notTok = await messaging().isDeviceRegisteredForRemoteMessages();
-  //     console.log("defaultAppMessaging",notTok)
-  //   } catch (error) {
-  //     console.log("e---",error)
-  //   }
-  // }
-  // hi()
 
   useEffect(() => {
     checkPermission();
     messageListener();
   }, []);
-  // const hi =async () => {
-  //   try {
-  //     ho = firebase.messaging().onMessage((message) => {
-  //      console.log(JSON.stringify(message));
-  //    });
-
-  //    console.log(ho)
-  //   } catch (error) {
-
-  //   }
-  // }
-  // console.log(hi())
-
   // const reg = async () => {
   //   try {
   //     let register =  firebase.notifications().;
@@ -130,14 +88,13 @@ export default function App() {
   //   // }
   // };
   const getFcmToken = async () => {
-    const fcmToken = await firebase.messaging().getToken();
-    if (fcmToken) {
-      setnotificationToken(fcmToken);
-      // console.log(fcmToken);
-      // showAlert('Your Firebase Token is:', fcmToken);
-    } else {
-      // showAlert('Failed', 'No token received');
-    }
+    let fcmToken = await AsyncStorage.getItem('fcmToken');
+    if (!fcmToken) {
+      fcmToken = await firebase.messaging().getToken();
+      if (fcmToken) {
+          await AsyncStorage.setItem('fcmToken', fcmToken);
+      }
+  }
   };
   const checkPermission = async () => {
     const enabled = await firebase.messaging().hasPermission();
@@ -220,7 +177,7 @@ export default function App() {
     return (
       <UserContext.Provider value={appUserContext}>
         <NavigationContainer>
-          <View>
+          {/* <View>
             {!!user ? (
               <Text>
                 Welcome{user._user.email} + {user._user.uid}
@@ -228,7 +185,7 @@ export default function App() {
             ) : (
               <Text>Login</Text>
             )}
-          </View>
+          </View> */}
           <Stack.Navigator
             screenOptions={{
               headerShown: false,
