@@ -26,6 +26,7 @@ import EnterBabyid from './screens/Auth/EnterBabyid';
 import SignupByIdScreen from './screens/Auth/SignupById';
 import CompleteSignUpBabyidScreen from './screens/Auth/CompleteSignUpBabyid';
 import EnterBraceletIdByBabyid from './screens/Auth/EnterBraceletIdByBabyid';
+import EmergencyNotification from './screens/Auth/EmergencyNotification';
 
 
 export default function App() {
@@ -258,6 +259,10 @@ export default function App() {
                 <Stack.Screen
                   name="EnterBraceletIdByBabyid"
                   component={EnterBraceletIdByBabyid}
+                />
+                <Stack.Screen
+                  name="EmergencyNotification"
+                  component={EmergencyNotification}
                 />
               </>
             )}

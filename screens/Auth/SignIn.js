@@ -76,7 +76,7 @@ export default function SignInScreen({navigation}) {
             />
           </View>
           <View style={styles.InnerContainer}>
-            <View style={{paddingTop: 10}}>
+            <View style={{paddingTop: 5}}>
               <Image
                 source={require('../../assets/logo.png')}
                 style={{
@@ -87,7 +87,7 @@ export default function SignInScreen({navigation}) {
                 }}
               />
             </View>
-            <View style={{paddingTop: 30}}>
+            <View style={{paddingTop: 20}}>
               <AppInput label="Email" onChangeText={(text) => setEmail(text)} />
             </View>
             <View style={{paddingTop: 30}}>
@@ -119,6 +119,14 @@ export default function SignInScreen({navigation}) {
                   navigation.navigate('EnterBraceletIdByBabyid');
                 }}>
                 <Text style={{color: '#EE979F'}}>Already have baby account</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{paddingTop: 15}}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate('EmergencyNotification');
+                }}>
+                <Text style={{color: '#EE979F'}}>Emergency Notifications</Text>
               </TouchableOpacity>
             </View>
           </View>
