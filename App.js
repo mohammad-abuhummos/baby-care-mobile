@@ -22,6 +22,12 @@ import EnterBraceletId from './screens/Auth/EnterBraceletId';
 import {UserContext} from './context/AppContext';
 import database from '@react-native-firebase/database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import EnterBabyid from './screens/Auth/EnterBabyid';
+import SignupByIdScreen from './screens/Auth/SignupById';
+import CompleteSignUpBabyidScreen from './screens/Auth/CompleteSignUpBabyid';
+import EnterBraceletIdByBabyid from './screens/Auth/EnterBraceletIdByBabyid';
+
+
 export default function App() {
   const [initializing, setInitializing] = useState(true);
   const [user, setUser] = useState(null);
@@ -236,6 +242,22 @@ export default function App() {
                 <Stack.Screen
                   name="CompleteSignUp"
                   component={CompleteSignUp}
+                />
+                <Stack.Screen
+                  name="EnterBabyid"
+                  component={EnterBabyid}
+                />
+                <Stack.Screen
+                  name="SignupByIdScreen"
+                  component={SignupByIdScreen}
+                />
+                <Stack.Screen
+                  name="CompleteSignUpBabyidScreen"
+                  component={CompleteSignUpBabyidScreen}
+                />
+                <Stack.Screen
+                  name="EnterBraceletIdByBabyid"
+                  component={EnterBraceletIdByBabyid}
                 />
               </>
             )}
