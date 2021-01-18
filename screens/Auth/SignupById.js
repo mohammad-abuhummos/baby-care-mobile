@@ -1,49 +1,53 @@
 import React from 'react';
 import {
   StyleSheet,
-  Text,
+Dimensions,
   View,
   Image,
   SafeAreaView,
   ScrollView,
-  Dimensions,
+  Alert,
 } from 'react-native';
 import Button from '../../components/Button';
 import AppInput from '../../components/AppInput';
-import UserSignIn from '../../models/UserSignIn';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import UserSignUp from '../../models/UserSignUp';
 import {displayError} from '../../models/helpers';
 import auth from '@react-native-firebase/auth';
 import LoadingIndicator from '../../components/LoadingIndicator';
-import {UserContext} from '../../context/AppContext';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-export default function SignInScreen({navigation}) {
-  const {setIsSignUp, setUserAuth} = React.useContext(UserContext);
+import { UserContext } from '../../context/AppContext';
+export default function SignupByIdScreen({navigation}) {
   const [loading, setLoading] = React.useState(false);
-  const [Email, setEmail] = React.useState();
-  const [Password, setPassword] = React.useState();
-  const input = {
-    email: Email,
-    password: Password,
-  };
-  const validate = (email, password) => {
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [passwordConfirmation, setPasswordConfirmation] = React.useState('');
+  const validate = (email, password, passwordConfirmation) => {
     setLoading(true);
-    let sign_in_info = new UserSignIn(email, password);
-    if (sign_in_info.isValid()) {
+    let sign_up_info = new UserSignUp(email, password, passwordConfirmation);
+    if (sign_up_info.isValid()) {
       auth()
-        .signInWithEmailAndPassword(email, password)
-        .then(() => {
+        .createUserWithEmailAndPassword(email, password)
+        .then((respon) => {
           setLoading(false);
+          navigation.navigate('CompleteSignUpBabyidScreen');
           console.log('User account created & signed in!');
+          console.log('set user',respon);
         })
         .catch((error) => {
           setLoading(false);
-          displayError('Invalid Information', 'invalid email or password');
+          if (error.code === 'auth/email-already-in-use') {
+            Alert.alert('that email address is already in use!');
+          }
+
+          if (error.code === 'auth/invalid-email') {
+            Alert.alert('that email address is invalid!');
+          }
           console.log(error);
         });
     } else {
       setLoading(false);
-      console.log(sign_in_info.errors());
-      displayError('Invalid Information', sign_in_info.errors().join(', '));
+      console.log(sign_up_info.errors());
+      displayError('Invalid Information', sign_up_info.errors().join(', '));
     }
   };
   if (loading) {
@@ -52,18 +56,30 @@ export default function SignInScreen({navigation}) {
     return (
       <SafeAreaView style={styles.container}>
         <ScrollView>
+          <View style={{position: 'absolute', top: 10, left: 20}}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
+              <Image
+                source={require('../../assets/back-icon.png')}
+                style={{
+                  width: 50,
+                  height: 50,
+                  resizeMode: 'center',
+                }}
+              />
+            </TouchableOpacity>
+          </View>
           <View
             style={{
               justifyContent: 'center',
               alignItems: 'center',
             }}>
             <Image
-              source={require('../../assets/Signin.png')}
+              source={require('../../assets/Signup.png')}
               style={{
                 width: 100,
-                height: 70,
+                height:70,
                 resizeMode: 'center',
-                marginBottom: -10,
+                marginBottom:-10,
               }}
             />
             <Image
@@ -88,7 +104,11 @@ export default function SignInScreen({navigation}) {
               />
             </View>
             <View style={{paddingTop: 30}}>
-              <AppInput label="Email" onChangeText={(text) => setEmail(text)} />
+              <AppInput
+                label="Email"
+                disableFullscreenUI={true}
+                onChangeText={(text) => setEmail(text)}
+              />
             </View>
             <View style={{paddingTop: 30}}>
               <AppInput
@@ -98,29 +118,21 @@ export default function SignInScreen({navigation}) {
               />
             </View>
             <View style={{paddingTop: 30}}>
-              <Button
-                title="Sign in"
-                onPress={() => validate(Email, Password)}
+              <AppInput
+                label="Retype password"
+                onChangeText={(text) => setPasswordConfirmation(text)}
+                secureTextEntry={true}
               />
             </View>
             <View style={{paddingTop: 30}}>
               <Button
-                title="Sign up"
-                onPress={() => {
-                  setIsSignUp(false);
-                  navigation.navigate('EnterBraceletId');
-                }}
+                title="Next"
+                onPress={() => validate(email, password, passwordConfirmation)}
               />
             </View>
-            <View style={{paddingTop: 15}}>
-              <TouchableOpacity
-                onPress={() => {
-                  setIsSignUp(false);
-                  navigation.navigate('EnterBraceletIdByBabyid');
-                }}>
-                <Text style={{color: '#EE979F'}}>Already have baby account</Text>
-              </TouchableOpacity>
-            </View>
+            {/* <View style={{paddingTop: 30}}>
+              <Button title="sign out" onPress={() => SignOutUser()} />
+            </View> */}
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -131,7 +143,7 @@ export default function SignInScreen({navigation}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffff',
+    backgroundColor: '#fafafa',
     alignItems: 'center',
   },
   HedaerPink: {
@@ -139,10 +151,9 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: 'normal',
     padding: 10,
-    fontFamily: 'Pacificos',
   },
   InnerContainer: {
-    paddingHorizontal: 50,
+    paddingHorizontal: 20,
     justifyContent: 'center',
     alignItems: 'center',
   },
