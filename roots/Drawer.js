@@ -22,8 +22,8 @@ export default function AppDrawer() {
     auth()
       .signOut()
       .then(() => {
-        setUserAuth(false);
         setUser(null);
+        setUserAuth(false);
       });
   };
   function CustomDrawerContentComponent(props) {
