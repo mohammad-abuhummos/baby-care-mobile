@@ -9,16 +9,22 @@ import {
 } from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import Button from '../components/Button';
-import { UserContext } from '../context/AppContext';
+import {UserContext} from '../context/AppContext';
 import database from '@react-native-firebase/database';
 import LabelAndText from '../components/LabelAndText';
 import LoadingIndicator from '../components/LoadingIndicator';
+import Clipboard from '@react-native-community/clipboard';
 
 export default function BabyProfile({route, navigation}) {
   const {bracelet, user, setReload, setInitializing} = React.useContext(
     UserContext,
   );
   const [loading, setLoading] = React.useState(true);
+  const [copiedText, setCopiedText] = React.useState('');
+
+  const copyToClipboard = () => {
+    Clipboard.setString(parms.item.id);
+  };
   const currentDate = () => {
     return new Date().toJSON().slice(0, 10).replace(/-/g, '-');
   };
@@ -29,7 +35,7 @@ export default function BabyProfile({route, navigation}) {
     try {
       await database()
         .ref(`${bracelet}`)
-        .update({babyId: `${parms.id}`, userId: `${user.uid}`})
+        .update({babyId: `${parms.item.id}`, userId: `${user.uid}`})
         .then(() => {
           // navigation.navigate('Home');
           setInitializing(true);
@@ -47,14 +53,8 @@ export default function BabyProfile({route, navigation}) {
   };
 
   React.useEffect(() => {
-    // const onValueChange = database()
-    //   .ref(`/users/${user._user.uid}/baby/babyInfo`)
-    //   .on('value', (snapshot) => {
-    //     setCurrntBaby(snapshot.val());
-    //   });
-    //   return () => database().ref(`/Data`).off('value', onValueChange);
-    setLoading(false);
-  }, []);
+    if (!!parms) setLoading(false);
+  }, [parms]);
   if (!!loading) {
     return <LoadingIndicator />;
   } else {
@@ -65,9 +65,9 @@ export default function BabyProfile({route, navigation}) {
             <TouchableOpacity>
               <Image
                 source={
-                  !!parms.info.img
-                    ? {uri: parms.info.img}
-                    : require('../assets/add-image-icon.png')
+                  !!parms.item.img
+                    ? {uri: parms.item.img}
+                    : require('../assets/profile-icon.png')
                 }
                 style={{
                   width: 180,
@@ -78,16 +78,16 @@ export default function BabyProfile({route, navigation}) {
             </TouchableOpacity>
           </View>
           <View style={{paddingTop: 30}}>
-            <LabelAndText label="Name" text={parms.info.name} />
+            <LabelAndText label="Name" text={parms.item.name} />
           </View>
           <View style={{paddingTop: 30}}>
             <LabelAndText
               label="Age"
-              text={`${CalculateAge(parms.info.date)} year`}
+              text={`${CalculateAge(parms.item.date)} year`}
             />
           </View>
           <View style={{paddingTop: 30}}>
-            <LabelAndText label="Gender" text={parms.info.gender} />
+            <LabelAndText label="Gender" text={parms.item.gender} />
           </View>
 
           <View
@@ -108,6 +108,9 @@ export default function BabyProfile({route, navigation}) {
                 onPress={() => navigation.navigate('EditBabyinfo', parms)}
               />
             </View>
+          </View>
+          <View style={{width: 140, paddingTop: 15}}>
+            <Button title="Copy baby Id" onPress={copyToClipboard} />
           </View>
         </View>
       </SafeAreaView>
