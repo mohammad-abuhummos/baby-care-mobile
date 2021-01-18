@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   StyleSheet,
-  Text,
   View,
   Image,
   SafeAreaView,
@@ -12,39 +11,32 @@ import Button from '../../components/Button';
 import AppInput from '../../components/AppInput';
 import UserSignIn from '../../models/UserSignIn';
 import {displayError} from '../../models/helpers';
-import auth from '@react-native-firebase/auth';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import {UserContext} from '../../context/AppContext';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-export default function SignInScreen({navigation}) {
-  const {setIsSignUp, setUserAuth} = React.useContext(UserContext);
+import database from '@react-native-firebase/database';
+export default function EnterBabyid({navigation}) {
+  const {user, setUserAuth, setBabyId, setIsSignUp, babyId} = React.useContext(
+    UserContext,
+  );
   const [loading, setLoading] = React.useState(false);
-  const [Email, setEmail] = React.useState();
-  const [Password, setPassword] = React.useState();
-  const input = {
-    email: Email,
-    password: Password,
-  };
-  const validate = (email, password) => {
-    setLoading(true);
-    let sign_in_info = new UserSignIn(email, password);
-    if (sign_in_info.isValid()) {
-      auth()
-        .signInWithEmailAndPassword(email, password)
-        .then(() => {
-          setLoading(false);
-          console.log('User account created & signed in!');
-        })
-        .catch((error) => {
-          setLoading(false);
-          displayError('Invalid Information', 'invalid email or password');
-          console.log(error);
-        });
-    } else {
-      setLoading(false);
-      console.log(sign_in_info.errors());
-      displayError('Invalid Information', sign_in_info.errors().join(', '));
-    }
+  const addRefBaby = () => {
+    database()
+      .ref('babys')
+      .once('value')
+      .then((snapshot) => {
+        var Baby = snapshot.child(`${babyId}`).exists();
+        if (Baby) {
+          const newReference = database()
+            .ref(`/users/${user.uid}/baby/`)
+            .push();
+          newReference.set({id: `${babyId}`}).then(() => {
+            setIsSignUp(true);
+            setUserAuth(true);
+          });
+        } else {
+          displayError('Invalid Information', 'Invalid Baby id');
+        }
+      });
   };
   if (loading) {
     return <LoadingIndicator />;
@@ -58,7 +50,7 @@ export default function SignInScreen({navigation}) {
               alignItems: 'center',
             }}>
             <Image
-              source={require('../../assets/Signin.png')}
+              source={require('../../assets/Barcletid.png')}
               style={{
                 width: 100,
                 height: 70,
@@ -88,38 +80,18 @@ export default function SignInScreen({navigation}) {
               />
             </View>
             <View style={{paddingTop: 30}}>
-              <AppInput label="Email" onChangeText={(text) => setEmail(text)} />
-            </View>
-            <View style={{paddingTop: 30}}>
               <AppInput
-                label="Password"
-                onChangeText={(text) => setPassword(text)}
-                secureTextEntry={true}
+                label="Baby Id"
+                onChangeText={(text) => setBabyId(text)}
               />
             </View>
             <View style={{paddingTop: 30}}>
               <Button
-                title="Sign in"
-                onPress={() => validate(Email, Password)}
-              />
-            </View>
-            <View style={{paddingTop: 30}}>
-              <Button
-                title="Sign up"
+                title="Next"
                 onPress={() => {
-                  setIsSignUp(false);
-                  navigation.navigate('EnterBraceletId');
+                  addRefBaby();
                 }}
               />
-            </View>
-            <View style={{paddingTop: 15}}>
-              <TouchableOpacity
-                onPress={() => {
-                  setIsSignUp(false);
-                  navigation.navigate('EnterBraceletIdByBabyid');
-                }}>
-                <Text style={{color: '#EE979F'}}>Already have baby account</Text>
-              </TouchableOpacity>
             </View>
           </View>
         </ScrollView>
