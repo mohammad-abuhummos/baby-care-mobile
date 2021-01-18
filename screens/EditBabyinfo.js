@@ -12,37 +12,37 @@ import {TouchableOpacity} from 'react-native-gesture-handler';
 import Button from '../components/Button';
 import AppInput from '../components/AppInput';
 import LoadingIndicator from '../components/LoadingIndicator';
-import { UserContext } from '../context/AppContext';
+import {UserContext} from '../context/AppContext';
 import database from '@react-native-firebase/database';
 import DatePicker from 'react-native-datepicker';
 import RadioButtonRN from 'radio-buttons-react-native';
 import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
+import {makeid} from '../utils/string';
 
 export default function EditBabyinfo({route, navigation}) {
   const parms = route.params;
   // const [currntBaby, setCurrntBaby] = React.useState();
-  const {user} = React.useContext(UserContext);
+  const {user, setEditLoding, EditLoding} = React.useContext(UserContext);
   const [image, setImage] = React.useState(null);
   const [uploading, setUploading] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
-  const [name, setName] = React.useState(parms.info.name);
-  const [date, setDate] = React.useState(parms.info.date);
+  const [name, setName] = React.useState(parms.item.name);
+  const [date, setDate] = React.useState(parms.item.date);
   const [imageUrl, setImageUrl] = React.useState(null);
-  const [gender, setGender] = React.useState(parms.info.gender);
+  const [gender, setGender] = React.useState(parms.item.gender);
+  const [token, setToken] = React.useState(parms.item.gender);
   const currentDate = () => {
     return new Date().toJSON().slice(0, 10).replace(/-/g, '-');
   };
 
-  // React.useEffect(() => {
-  //   if (!!imageUrl) {
-  //     updateImge();
-  //   }
-  // }, [imageUrl]);
+  React.useEffect(() => {
+    setToken(makeid(12));
+  }, []);
   const getBabyImage = async () => {
     try {
       const url = await storage()
-        .ref(`/users/${user._user.uid}/baby/${parms.id}/`)
+        .ref(`/babys/${parms.item.id}/`)
         .getDownloadURL();
       setImageUrl(url);
       console.log('url-----', url);
@@ -59,14 +59,16 @@ export default function EditBabyinfo({route, navigation}) {
   const handleInfo = () => {
     setLoading(true);
     // setIsLoading(true);
+    setEditLoding(token);
     const babyInfo = {
       name: name,
       date: date,
       gender: gender,
-      img: !!imageUrl ? imageUrl : parms.info.img,
+      img: !!imageUrl ? imageUrl : parms.item.img,
+      id: parms.item.id,
     };
     database()
-      .ref(`/users/${user._user.uid}/baby/${parms.id}/`)
+      .ref(`/babys/${parms.item.id}/`)
       .update({babyInfo})
       .then(() => {
         setLoading(false);
@@ -96,7 +98,7 @@ export default function EditBabyinfo({route, navigation}) {
   };
 
   const uploadImage = async (uri) => {
-    const fileKey = `/users/${user._user.uid}/baby/${parms.id}/`;
+    const fileKey = `/babys/${parms.item.id}/`;
     const uploadUri = uri;
     setUploading(true);
     const task = storage().ref(fileKey).putFile(uploadUri);
@@ -118,7 +120,7 @@ export default function EditBabyinfo({route, navigation}) {
           <View style={styles.InnerContainer}>
             <TouchableOpacity onPress={pickImage}>
               <View style={{paddingTop: 40}}>
-                {!!parms.info.img && (
+                {!!parms.item.img && (
                   <View style={{position: 'absolute', top: 40, zIndex: 5}}>
                     <Image
                       source={require('../assets/add-image.png')}
@@ -132,8 +134,8 @@ export default function EditBabyinfo({route, navigation}) {
                 )}
                 <Image
                   source={
-                    !!parms.info.img
-                      ? {uri: !!image ? image : parms.info.img}
+                    !!parms.item.img
+                      ? {uri: !!image ? image : parms.item.img}
                       : require('../assets/profile-icon.png')
                   }
                   style={{
@@ -146,7 +148,7 @@ export default function EditBabyinfo({route, navigation}) {
             </TouchableOpacity>
             <View style={{paddingTop: 30}}>
               <AppInput
-                placeholder={parms.info.name}
+                placeholder={parms.item.name}
                 label="Name"
                 autoCapitalize="words"
                 onChangeText={(text) => setName(text)}
@@ -196,7 +198,7 @@ export default function EditBabyinfo({route, navigation}) {
                     style={{width: '100%'}}
                     date={date}
                     mode="date"
-                    placeholder={parms.info.date}
+                    placeholder={parms.item.date}
                     format="YYYY-MM-DD"
                     minDate="2016-05-01"
                     maxDate={currentDate()}

@@ -10,56 +10,50 @@ import LoadingIndicator from '../components/LoadingIndicator';
 import Card from '../components/Card';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function Home() {
-  const {
-    babyId,
-    user,
-    setBabyId,
-    setBracelet,
-    bracelet,
-  } = React.useContext(UserContext);
+  const {babyId, user, setBabyId, setBracelet, bracelet} = React.useContext(
+    UserContext,
+  );
   const [invoked, setInvoked] = React.useState(null);
   const [isBracelet, setIsBracelet] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
-  const [babyImage, setBabyImage] = React.useState(null); 
+  const [babyImage, setBabyImage] = React.useState(null);
   const [currnetSign, setCurrnetSign] = React.useState(0);
   const [currnetBaby, setCurrnetBaby] = React.useState();
   const [notificationToken, setNotificationToken] = React.useState();
   const [DialogVal, setDialogVal] = React.useState({visible: false});
-console.log("babyId",babyId);
+  console.log('babyId', babyId);
+  setTimeout(function () {
+    setLoading(false);
+  }, 3000);
+  // // setTimeout(function(){ setLoading(false) }, );
 
-  const getfmctoken = async() =>{
+  const getfmctoken = async () => {
     let fcmToken = await AsyncStorage.getItem('fcmToken');
     setNotificationToken(fcmToken);
-  }
+  };
   const getBabyId = () => {
-    const onValueChange =
-     database()
+    const onValueChange = database()
       .ref(`${bracelet}/babyId`)
       .once('value', (snapshot) => {
         setBabyId(snapshot.val());
       })
-      .then(()=>{
-
-      })
+      .then(() => {});
     return () =>
       database().ref(`${bracelet}/babyId`).off('value', onValueChange);
   };
 
   const getBabyInfo = () => {
-    const onValueChange =
-     database()
+    const onValueChange = database()
       .ref(`babys/${babyId}/babyInfo`)
       .once('value', (snapshot) => {
         setCurrnetBaby(snapshot.val());
       });
     return () =>
-      database()
-        .ref(`babys/${babyId}/babyInfo`)
-        .off('value', onValueChange);
+      database().ref(`babys/${babyId}/babyInfo`).off('value', onValueChange);
   };
 
   const getBraceletId = () => {
-    const onValueChange =  database()
+    const onValueChange = database()
       .ref(`users/${user.uid}/bracletId/`)
       .on('value', (snapshot) => {
         setBracelet(snapshot.val());
@@ -73,40 +67,46 @@ console.log("babyId",babyId);
     getBraceletId();
   }, []);
   React.useEffect(() => {
-    getfmctoken()
-    console.log("notificationTokenHOme-------------------------",notificationToken)
-        database()
-        .ref(`users/${user.uid}/notificationToken`)
-        .set({notificationToken: notificationToken})
+    getfmctoken();
+    console.log(
+      'notificationTokenHOme-------------------------',
+      notificationToken,
+    );
+    database()
+      .ref(`users/${user.uid}/notificationToken`)
+      .set({notificationToken: notificationToken});
   }, [notificationToken]);
   React.useEffect(() => {
     // console.log('braceletbracelet', !!bracelet);
     if (!!bracelet) {
-      getBabyId()
+      getBabyId();
     }
   }, [isBracelet]);
 
   React.useEffect(() => {
-      getBabyInfo();
-      database()
+    getBabyInfo();
+    database()
       .ref(`babys/${babyId}/users/${user.uid}/`)
-      .set({notificationToken: notificationToken})
+      .set({notificationToken: notificationToken});
   }, [babyId]);
   React.useEffect(() => {
     if (!!babyId) {
-      setLoading(false);
+      // setLoading(false);
     }
   }, [babyId]);
 
   // getBabyInfo();
   React.useEffect(() => {
-    const onValueChange = database()
-      .ref(`/babys/${babyId}/data`)
-      .on('value', (snapshot) => {
-        setCurrnetSign(snapshot.val());
-      });
-    return () => database().ref(`/data`).off('value', onValueChange);
-  }, []);
+    if (!!babyId) {
+      let babyref = `/babys/${babyId}/data`;
+      const onValueChange = database()
+        .ref(babyref)
+        .on('value', (snapshot) => {
+          setCurrnetSign(snapshot.val());
+        });
+      return () => database().ref(`/data`).off('value', onValueChange);
+    }
+  }, [babyId]);
 
   React.useEffect(() => {
     if (!!user) {
@@ -127,12 +127,38 @@ console.log("babyId",babyId);
           paddingHorizontal: 20,
         }}>
         <View style={{paddingTop: 30, width: '100%'}}>
-          <BabyInfoCard
-            name={!!currnetBaby && currnetBaby.name}
-            img={!!currnetBaby && {uri: currnetBaby.img}}
-            color="#fff"
-            status={true}
-          />
+          {!!currnetBaby ? (
+            <BabyInfoCard
+              name={!!currnetBaby && currnetBaby.name}
+              img={
+                !!currnetBaby.img
+                  ? {uri: currnetBaby.img}
+                  : require('../assets/profile-icon.png')
+              }
+              color="#fff"
+              status={true}
+            />
+          ) : (
+            <Card>
+              <View style={{flexDirection: 'row', width: '100%', height: 90}}>
+                <View
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: '100%',
+                  }}>
+                  <Text
+                    style={{
+                      fontWeight: 'bold',
+                      fontSize: 20,
+                      color: '#838487',
+                    }}>
+                    Please Select Baby 
+                  </Text>
+                </View>
+              </View>
+            </Card>
+          )}
           {/* {!!currnetBaby ? (
             <BabyInfoCard
               name={!!currnetBaby && currnetBaby.name}

@@ -14,10 +14,18 @@ import Card from '../components/Card';
 import LoadingIndicator from '../components/LoadingIndicator';
 
 export default function BabyAccounts({navigation}) {
-  const {babyId, user} = React.useContext(UserContext);
+  const {babyId, user,setEditLoding, EditLoding} = React.useContext(UserContext);
   const [loading, setLoading] = React.useState(false);
   const [Baby, setBaby] = React.useState(null);
   const [userbaby, setUserbaby] = React.useState([]);
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  // const onRefresh = React.useCallback(() => {
+  //   setRefreshing(true);
+
+  //   setTimeout(function(){setRefreshing(false),setEditLoding(false),setLoading(false)}, 1000);
+  // }, []);
+
   React.useEffect(() => {
     const onValueChange = database()
     .ref(`users/${user.uid}/baby/`)
@@ -60,9 +68,12 @@ export default function BabyAccounts({navigation}) {
           // console.log('userbaby', userbaby);
         });
     }
-  }, [Baby]);
+  }, [Baby,EditLoding]);
 
-  // React.useEffect(() => {}, []);
+  React.useEffect(() => {
+    setLoading(true)
+    setTimeout(function(){setLoading(false)}, 1000);
+  }, []);
   // Object.keys(Baby).map((key) => {
   //   let id = Baby[key].id;
   //   database()
@@ -162,7 +173,7 @@ export default function BabyAccounts({navigation}) {
                   : require('../assets/profile-icon.png')
               }
               color="#fff"
-              // status={babyId === id}
+              status={babyId === item.id}
             />
           </View>
         </TouchableOpacity>

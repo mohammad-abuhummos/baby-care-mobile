@@ -32,7 +32,10 @@ export default function App() {
   const [reload, setReload] = useState(null);
   const [isSignUp, setIsSignUp] = useState(true);
   const [notificationToken, setnotificationToken] = useState(null);
-// console.log("notificationToken",notificationToken)
+  const [EditLoding, setEditLoding] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // console.log("notificationToken",notificationToken)
 
   // console.log(
   //   'notificationToken-------',
@@ -67,7 +70,11 @@ export default function App() {
     }
   }, [user]);
 
-
+  useEffect(() => {
+    setTimeout(function () {
+      setLoading(false);
+    }, 4000);
+  }, []);
   useEffect(() => {
     checkPermission();
     messageListener();
@@ -92,16 +99,16 @@ export default function App() {
     if (!fcmToken) {
       fcmToken = await firebase.messaging().getToken();
       if (fcmToken) {
-          await AsyncStorage.setItem('fcmToken', fcmToken);
+        await AsyncStorage.setItem('fcmToken', fcmToken);
       }
-  }
+    }
   };
   const checkPermission = async () => {
     const enabled = await firebase.messaging().hasPermission();
     if (enabled) {
       getFcmToken();
     } else {
-      requestPermission(); 
+      requestPermission();
     }
   };
   const requestPermission = async () => {
@@ -162,6 +169,7 @@ export default function App() {
     bracelet,
     babyId,
     braceletIds,
+    EditLoding,
     setReload,
     setInitializing,
     setUser,
@@ -170,8 +178,9 @@ export default function App() {
     setBabyId,
     setBraceletIds,
     setIsSignUp,
+    setEditLoding,
   };
-  if (initializing) {
+  if (!!initializing || !!loading) {
     return <LoadingIndicator />;
   } else {
     return (
