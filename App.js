@@ -14,13 +14,11 @@ import CompleteSignUp from './screens/Auth/CompleteSignUp';
 import {NavigationContainer, DrawerItems} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import auth from '@react-native-firebase/auth';
-import firebase from 'react-native-firebase';
 import CreateBabyAccount from './screens/Auth/CreateBabyAccount';
 import LoadingIndicator from './components/LoadingIndicator';
 import AppDrawer from './roots/Drawer';
 import EnterBraceletId from './screens/Auth/EnterBraceletId';
 import {UserContext} from './context/AppContext';
-import database from '@react-native-firebase/database';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import EnterBabyid from './screens/Auth/EnterBabyid';
 import SignupByIdScreen from './screens/Auth/SignupById';
@@ -28,6 +26,7 @@ import CompleteSignUpBabyidScreen from './screens/Auth/CompleteSignUpBabyid';
 import EnterBraceletIdByBabyid from './screens/Auth/EnterBraceletIdByBabyid';
 import EmergencyNotification from './screens/Auth/EmergencyNotification';
 import ForgotPassword from './screens/Auth/ForgotPassword';
+import messaging from '@react-native-firebase/messaging';
 
 
 export default function App() {
@@ -43,18 +42,6 @@ export default function App() {
   const [EditLoding, setEditLoding] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // console.log("notificationToken",notificationToken)
-
-  // console.log(
-  //   'notificationToken-------',
-  //   notificationToken,
-  //   'isSignUp-------',
-  //   isSignUp,
-  //   'userAuth-------',
-  //   userAuth,
-  //   '----------user',
-  //   user,
-  // );
   function onAuthStateChanged(user) {
     if (!!user && isSignUp) {
       setUser(user);
@@ -65,112 +52,27 @@ export default function App() {
     const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
     return subscriber; // unsubscribe on unmount
   }, []);
+
   useEffect(() => {
     setInitializing(false);
     setReload(false);
   }, [reload]);
-  useEffect(() => {
-    if (isSignUp && !!user) {
-      database()
-        .ref(`users/${user.uid}/notificationToken`)
-        .set({notificationToken: notificationToken})
-        .then(() => setUserAuth(true));
-    }
-  }, [user]);
 
   useEffect(() => {
+    getFcmToken();
     setTimeout(function () {
       setLoading(false);
     }, 4000);
   }, []);
-  useEffect(() => {
-    checkPermission();
-    messageListener();
-  }, []);
-  // const reg = async () => {
-  //   try {
-  //     let register =  firebase.notifications().;
-  //       console.log("registerDeviceForRemoteMessages---",register)
-  //     setnotificationToken(register);
-  //   } catch (error) {
-  //     console.log("registerDeviceForRemoteMessages---",error)
-  //   }
-  //   // if (fcmToken) {
-  //   //   console.log(fcmToken);
-  //   //   showAlert('Your Firebase Token is:', fcmToken);
-  //   // } else {
-  //   //   showAlert('Failed', 'No token received');
-  //   // }
-  // };
   const getFcmToken = async () => {
     let fcmToken = await AsyncStorage.getItem('fcmToken');
     if (!fcmToken) {
-      fcmToken = await firebase.messaging().getToken();
+      fcmToken = await messaging().getToken();
       if (fcmToken) {
         await AsyncStorage.setItem('fcmToken', fcmToken);
       }
     }
   };
-  const checkPermission = async () => {
-    const enabled = await firebase.messaging().hasPermission();
-    if (enabled) {
-      getFcmToken();
-    } else {
-      requestPermission();
-    }
-  };
-  const requestPermission = async () => {
-    try {
-      await firebase.messaging().requestPermission();
-      // User has authorised
-    } catch (error) {
-      // User has rejected permissions
-    }
-  };
-  messageListener = async () => {
-    notificationListener = firebase
-      .notifications()
-      .onNotification((notification) => {
-        const {title, body} = notification;
-        // showAlert(title, body);
-      });
-
-    notificationOpenedListener = firebase
-      .notifications()
-      .onNotificationOpened((notificationOpen) => {
-        const {title, body} = notificationOpen.notification;
-        // showAlert(title, body);
-      });
-
-    const notificationOpen = await firebase
-      .notifications()
-      .getInitialNotification();
-    if (notificationOpen) {
-      const {title, body} = notificationOpen.notification;
-      // showAlert(title, body);
-    }
-
-    messageListener = firebase.messaging().onMessage((message) => {
-      // console.log(JSON.stringify(message));
-    });
-  };
-  const showAlert = (title, message) => {
-    Alert.alert(
-      title,
-      message,
-      [{text: 'OK', onPress: () => console.log('OK Pressed')}],
-      {cancelable: false},
-    );
-  };
-  // useEffect(() => {
-  //   messaging()
-  //   .getToken()
-  //   .then(token => {
-  //    console.log("DeviceToken------",token)
-  //   })
-  //   // RE()
-  // }, []);
-
   const Stack = createStackNavigator();
   const appUserContext = {
     user,
