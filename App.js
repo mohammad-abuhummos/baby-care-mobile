@@ -27,6 +27,7 @@ import SignupByIdScreen from './screens/Auth/SignupById';
 import CompleteSignUpBabyidScreen from './screens/Auth/CompleteSignUpBabyid';
 import EnterBraceletIdByBabyid from './screens/Auth/EnterBraceletIdByBabyid';
 import EmergencyNotification from './screens/Auth/EmergencyNotification';
+import ForgotPassword from './screens/Auth/ForgotPassword';
 
 
 export default function App() {
@@ -263,6 +264,10 @@ export default function App() {
                 <Stack.Screen
                   name="EmergencyNotification"
                   component={EmergencyNotification}
+                />
+                <Stack.Screen
+                  name="ForgotPassword"
+                  component={ForgotPassword}
                 />
               </>
             )}

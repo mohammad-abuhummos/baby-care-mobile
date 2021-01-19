@@ -129,6 +129,14 @@ export default function SignInScreen({navigation}) {
                 <Text style={{color: '#EE979F'}}>Emergency Notifications</Text>
               </TouchableOpacity>
             </View>
+            <View style={{paddingTop: 15}}>
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate('ForgotPassword');
+                }}>
+                <Text style={{color: '#EE979F'}}>Forgot Password?</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </ScrollView>
       </SafeAreaView>
