@@ -20,6 +20,7 @@ import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
 import LoadingIndicator from '../components/LoadingIndicator';
 import {makeid} from '../utils/string';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function AddBaby({navigation}) {
   const {user} = React.useContext(UserContext);
   const [loading, setLoading] = React.useState(false);
@@ -34,8 +35,13 @@ export default function AddBaby({navigation}) {
   const [name, setName] = React.useState('');
   const [date, setDate] = React.useState('2016-05-15');
   const [gender, setGender] = React.useState('Female');
-
+  const [notificationToken, setNotificationToken] = React.useState();
+  const getfmctoken = async () => {
+    let fcmToken = await AsyncStorage.getItem('fcmToken');
+    setNotificationToken(fcmToken);
+  };
   React.useEffect(() => {
+    getfmctoken()
     if (!!id) {
       setnewId(makeid(12));
       gitId(false);
@@ -82,9 +88,9 @@ export default function AddBaby({navigation}) {
       .set({babyInfo})
       .then(() => {
         addRefBaby();
+        addRefNotifaction();
         if (!!image) {
           uploadImage(image).then(() => setLoading(false)).then(() => navigation.goBack());
-          
         } else {
           setLoading(false)
            navigation.goBack()
@@ -92,6 +98,11 @@ export default function AddBaby({navigation}) {
       });
   };
 
+  const addRefNotifaction = () => {
+    database()
+    .ref(`babys/${babyId}/users/${user.uid}/`)
+    .set({notificationToken: notificationToken});
+  };
   const addRefBaby = () => {
     const newReference = database().ref(`/users/${user.uid}/baby/`).push();
     newReference.set({id: `${babyId}`}).then(() => {});
@@ -140,18 +151,6 @@ export default function AddBaby({navigation}) {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        {/* <View style={{position: 'absolute', top: 10, left: 20}}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Image
-              source={require('../assets/back-icon.png')}
-              style={{
-                width: 50,
-                height: 50,
-                resizeMode: 'center',
-              }}
-            />
-          </TouchableOpacity>
-        </View> */}
         <View style={styles.InnerContainer}>
           <View style={{paddingTop: 10}}>
             <TouchableOpacity onPress={pickImage}>
@@ -230,7 +229,7 @@ export default function AddBaby({navigation}) {
                   mode="date"
                   placeholder="select date"
                   format="YYYY-MM-DD"
-                  minDate="2016-05-01"
+                  minDate="2010-01-01"
                   maxDate={currentDate()}
                   confirmBtnText="Confirm"
                   cancelBtnText="Cancel"
@@ -243,7 +242,6 @@ export default function AddBaby({navigation}) {
                       borderWidth: 1,
                       padding: 5,
                     },
-                    // ... You can check the source to find the other keys.
                   }}
                   onDateChange={(date) => {
                     setDate(date);
