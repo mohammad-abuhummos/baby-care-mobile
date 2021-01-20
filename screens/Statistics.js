@@ -3,24 +3,18 @@ import {
   StyleSheet,
   Text,
   View,
-  Image,
   SafeAreaView,
   Dimensions,
-  ScrollView,
   ActivityIndicator,
 } from 'react-native';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import Button from '../components/Button';
-import { UserContext } from '../context/AppContext';
+import {UserContext} from '../context/AppContext';
 import database from '@react-native-firebase/database';
-import LabelAndText from '../components/LabelAndText';
 import {LineChart} from 'react-native-chart-kit';
 import LoadingIndicator from '../components/LoadingIndicator';
 import SelectButton from '../components/SelectButton';
-import dayjs from 'dayjs';
 
 export default function Statistics({navigation}) {
-  const {user,babyId} = React.useContext(UserContext);
+  const {user, babyId} = React.useContext(UserContext);
   const [loading, setLoading] = React.useState(true);
   const [loadingChart, setLoadingChart] = React.useState(false);
   const [userProfile, setuserProfile] = React.useState();
@@ -28,43 +22,69 @@ export default function Statistics({navigation}) {
   const [queryOn, setqueryOn] = React.useState('1 Hour');
   const [query, setquery] = React.useState(null);
   const [queryResult, setqueryResult] = React.useState([]);
-
-  let currntDate = () => {
-    var currentdate = new Date();
-    var Year = currentdate.getFullYear();
-    var Month = currentdate.getMonth() + 1;
-    var Day = currentdate.getDate();
-    var Hour = currentdate.getHours() + 2;
-    var Minute = currentdate.getMinutes();
-    var Second = currentdate.getSeconds();
-    let date =
-      Year + '-' + Month + '-' + Day + 'T' + Hour + ':' + Minute + ':' + Second;
-    return date;
-  };
-  let QcurrntDate = (mo, d, h, m) => {
-    var currentdate = new Date();
-    var Year = currentdate.getFullYear();
-    var Month = currentdate.getMonth() + 1 - mo;
-    var Day = currentdate.getDate() - d;
-    var Hour = currentdate.getHours() + 2 - h;
-    var Minute = currentdate.getMinutes() - m;
-    var Second = currentdate.getSeconds();
-    let date =
-      Year + '-' + Month + '-' + Day + 'T' + Hour + ':' + Minute + ':' + Second;
-    return date;
-  };
+  const [arryOfdurtion, setArryOfdurtion] = React.useState([]);
   let lastHourDate = () => {
     var currentdate = new Date();
-    var Hour = currentdate.getHours() + 2 - 1;
+    var Hour = currentdate.getHours();
     return Hour;
   };
 
-  // const RenderLables = (q) =>{
-  //   return q[0].map((d) =>{
 
-  //   })
-  // }
+  const araryOfquters = () => {
+    var date = Date.now();
+    if (queryOn === '1 Hour') {
+      let quters = [0, 0, 0, 0, 0];
+      return quters.map((data,index) => {
+        if (index === 0) {
+          return date;
+        } else {
+          return (date / 1000 - 900 * index) * 1000;
+        }
+      });
+    } 
+     if (queryOn === '7 Hour') {
+      let quters = [0, 0, 0, 0, 0, 0, 0];
+      return quters.map((data,index) => {
+        if (index === 0) {
+          return date;
+        } else {
+          return ((date / 1000) - (3600 * index)) * 1000;
+        }
+      });
+    } 
+     if (queryOn === 'Week') {
+      let quters = [0, 0, 0, 0,0,0,0];
+      return quters.map((data,index) => {
+       return  ((date / 1000) - (8600 * index)) * 10000;
+        
+      });
+    } 
+     if (queryOn === 'Month') {
+      let quters = [0, 0, 0, 0];
+      return quters.map((data,index) => {
+        if (index === 0) {
+          return date;
+        } else {
+          return (date / 1000000 - 604800 * index) * 1000000;
+        }
+      });
+    }
+  };
 
+  console.log("araryOfquters()",araryOfquters())
+
+  let lastDate = () => {
+    var date = Date.now();
+    if (queryOn === '1 Hour') {
+      return (date / 1000 - 3600) * 1000;
+    } else if (queryOn === '7 Hour') {
+      return (date / 1000 - 3600 * 7) * 1000;
+    } else if (queryOn === 'Week') {
+      return (date / 1000 - 604800) * 1000;
+    } else if (queryOn === 'Month') {
+      return (date / 1000 - 604800 * 4) * 1000;
+    }
+  };
   React.useEffect(() => {
     const onValueChange = database()
       .ref(`/users/${user._user.uid}/info`)
@@ -80,7 +100,6 @@ export default function Statistics({navigation}) {
   React.useEffect(() => {
     qury();
   }, [queryOn, Sign]);
-
   const RenderKey = (data) => {
     if (!!data) {
       var keys = [];
@@ -93,14 +112,6 @@ export default function Statistics({navigation}) {
         `${lastHourDate() + 1}:00`,
       ];
       var sgin;
-      // Object.entries(data).forEach(([key, value]) => {
-      //   keys.push(key);
-      //   val.push(value);
-      // });
-      // datalable = keys.map((key) => {
-      //   return dayjs.unix(key).hour();
-      // });
-
       let frag = 0;
       let initarry;
       if (queryOn === '1 Hour') {
@@ -117,12 +128,12 @@ export default function Statistics({navigation}) {
         frag = 7;
         datalable = [
           `${lastHourDate()}`,
-          `${lastHourDate()}`,
-          `${lastHourDate()}`,
-          `${lastHourDate()}`,
           `${lastHourDate() + 1}`,
-          `${lastHourDate() + 1}`,
-          `${lastHourDate() + 1}`,
+          `${lastHourDate() + 2}`,
+          `${lastHourDate() + 3}`,
+          `${lastHourDate() + 4}`,
+          `${lastHourDate() + 5}`,
+          `${lastHourDate() + 6}`,
         ];
         initarry = [0, 0, 0, 0, 0, 0, 0];
       } else if (queryOn === 'Week') {
@@ -142,20 +153,49 @@ export default function Statistics({navigation}) {
         datalable = [`w1`, `w2`, `w3`, `w4`];
         initarry = [0, 0, 0, 0];
       }
-      let quarterSize = Math.floor(Object.values(data).length / frag);
-      let res = Object.values(data)
-        .reduce((accumulator, currentValue, currentIndex, array) => {
-          let currentQuarter = Math.floor(currentIndex / quarterSize);
-          accumulator[currentQuarter] =
-            accumulator[currentQuarter] + currentValue;
+      // console.log("araryOfquters()",araryOfquters()) 
+      const GetrAverge = () => {
+        let q = arryOfdurtion;
+        // console.log("arryOfdurtion",arryOfdurtion)
+        // console.log('araryOfquters()', q);
+        // console.log('araryOfquters()', query);
+        if (!!query) {
+          return q.map((index, date, elements) => {
+            let next;
+            if (date < q.length - 1) {
+              next = q[date + 1];
+            } else {
+              next = q[date];
+            }
+            // console.log('next', next);
+            let start = `${date}`
+             let  end = `${q[date + 1]}`;
+            let ans = Object.keys(query).filter((e) => e >= start && e <= end);
+            let result = ans.reduce((a, b) => a + query[b], 0) / ans.length;
+            if (!Number.isNaN(result)) {
+              return result;
+            } else {
+              return 0;
+            }
+          });
+        }
+      };
 
-          return accumulator;
-        }, initarry)
-        .map((sum) => sum / quarterSize);
-      sgin = res.filter((value) => !Number.isNaN(value));
-      console.log('res', Object.values(data));
-      console.log('res', res);
-      return [datalable, sgin];
+      // console.log("GetrAverge()",GetrAverge())
+      // let quarterSize = Math.floor(Object.values(data).length / frag);
+      // let res = Object.values(data)
+      //   .reduce((accumulator, currentValue, currentIndex, array) => {
+      //     let currentQuarter = Math.floor(currentIndex / quarterSize);
+      //     accumulator[currentQuarter] =
+      //       accumulator[currentQuarter] + currentValue;
+      //     return accumulator;
+      //   }, initarry)
+      //   .map((sum) => sum / quarterSize);
+      // sgin = res.filter((value) => !Number.isNaN(value));
+      // console.log("Getrange()",Getrange())
+      // console.log('res', Object.values(data));
+      // console.log('res', res);
+      return [datalable, GetrAverge()];
     } else {
       return false;
     }
@@ -163,40 +203,27 @@ export default function Statistics({navigation}) {
 
   const qury = async () => {
     setLoadingChart(true);
-    let start;
-    let end;
+    var start = Date.now();
+    var end = lastDate();
+
+    // console.log("lastDate()",lastDate())
+    setArryOfdurtion(araryOfquters())
     try {
-      if (queryOn === '1 Hour') {
-        start = dayjs(`${currntDate()}`).unix();
-        end = dayjs(`${QcurrntDate(0, 0, 1, 0)}`).unix();
-      } else if (queryOn === '7 Hour') {
-        start = dayjs(`${currntDate()}`).unix();
-        end = dayjs(`${QcurrntDate(0, 0, 7, 0)}`).unix();
-      } else if (queryOn === 'Week') {
-        start = dayjs(`${currntDate()}`).unix();
-        end = dayjs(`${QcurrntDate(0, 7, 0, 0)}`).unix();
-      } else if (queryOn === 'Month') {
-        start = dayjs(`${currntDate()}`).unix();
-        end = dayjs(`${QcurrntDate(1, 0, 0, 0)}`).unix();
-      }
-      console.log('startAt', start);
-      console.log('endAt', end);
-      console.log('startAt', dayjs.unix(start).toISOString());
-      console.log('endAt', dayjs.unix(end).toISOString());
+      // console.log("end",end)
       const scores = await database()
-        .ref(
-          `users/${user.uid}/baby/${babyId}/logs/${Sign}`,
-        )
+        .ref(`babys/0finyumOYxgW/logs/${Sign}`)
         .orderByKey()
         .startAt(`${end}`)
         .endAt(`${start}`)
         .once('value');
       setquery(scores._snapshot.value);
+
       setLoadingChart(false);
-      console.log(scores);
+      // console.log('araryOfquters()', );
+      // console.log(scores);
     } catch (error) {
       setLoadingChart(false);
-      console.log('error', error);
+      // console.log('error', error);
     }
   };
 
