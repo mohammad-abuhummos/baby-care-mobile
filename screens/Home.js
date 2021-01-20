@@ -4,7 +4,6 @@ import Dialog, {DialogContent} from 'react-native-popup-dialog';
 import {VitalSignsCard, BabyInfoCard} from '../components/VitalSignsCard';
 import database, {firebase} from '@react-native-firebase/database';
 import {UserContext} from '../context/AppContext';
-import storage from '@react-native-firebase/storage';
 import {Image} from 'react-native';
 import LoadingIndicator from '../components/LoadingIndicator';
 import Card from '../components/Card';
@@ -31,6 +30,19 @@ export default function Home() {
     let fcmToken = await AsyncStorage.getItem('fcmToken');
     setNotificationToken(fcmToken);
   };
+  React.useEffect(() => {
+    getfmctoken();
+    console.log(
+      'notificationTokenHOme-------------------------',
+      notificationToken,
+    );
+    database()
+      .ref(`users/${user.uid}/notificationToken`)
+      .set({notificationToken: notificationToken});
+      database()
+      .ref(`babys/${babyId}/users/${user.uid}/`)
+      .set({notificationToken: notificationToken});
+  }, []);
   const getBabyId = () => {
     const onValueChange = database()
       .ref(`${bracelet}/babyId`)
@@ -75,6 +87,10 @@ export default function Home() {
     database()
       .ref(`users/${user.uid}/notificationToken`)
       .set({notificationToken: notificationToken});
+
+      database()
+      .ref(`babys/${babyId}/users/${user.uid}/`)
+      .set({notificationToken: notificationToken});
   }, [notificationToken]);
   React.useEffect(() => {
     // console.log('braceletbracelet', !!bracelet);
@@ -85,14 +101,7 @@ export default function Home() {
 
   React.useEffect(() => {
     getBabyInfo();
-    database()
-      .ref(`babys/${babyId}/users/${user.uid}/`)
-      .set({notificationToken: notificationToken});
-  }, [babyId]);
-  React.useEffect(() => {
-    if (!!babyId) {
-      // setLoading(false);
-    }
+
   }, [babyId]);
 
   // getBabyInfo();
@@ -107,7 +116,6 @@ export default function Home() {
       return () => database().ref(`/data`).off('value', onValueChange);
     }
   }, [babyId]);
-
   React.useEffect(() => {
     if (!!user) {
       if (!!currnetSign && !!currnetSign.bpm === 0) {
