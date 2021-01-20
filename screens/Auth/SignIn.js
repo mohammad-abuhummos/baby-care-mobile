@@ -25,15 +25,17 @@ export default function SignInScreen({navigation}) {
     email: Email,
     password: Password,
   };
-  const validate = (email, password) => {
+  const validate = async(email, password) => {
     setLoading(true);
     let sign_in_info = new UserSignIn(email, password);
     if (sign_in_info.isValid()) {
-      auth()
+     await auth()
         .signInWithEmailAndPassword(email, password)
         .then(() => {
-          setLoading(false);
-          console.log('User account created & signed in!');
+          setTimeout(function () {
+            setLoading(false);
+            setUserAuth(true);
+          }, 6000);
         })
         .catch((error) => {
           setLoading(false);
