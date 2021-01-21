@@ -20,6 +20,8 @@ import ImagePicker from 'react-native-image-crop-picker';
 import storage from '@react-native-firebase/storage';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import { makeid } from '../../utils/string';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { displayError } from '../../models/helpers';
 
 export default function CreateBabyAccount({navigation}) {
   const {
@@ -33,19 +35,27 @@ export default function CreateBabyAccount({navigation}) {
   const [loading, setLoading] = React.useState(false);
   const [uploading, setUploading] = React.useState(false);
   const [image, setImage] = React.useState(null); 
-  const [name, setName] = React.useState('');
+  const [name, setName] = React.useState(null);
   const [date, setDate] = React.useState('2016-05-15');
   const [gender, setGender] = React.useState('Female');
   const [imageUrl, setImageUrl] = React.useState(null);
   const [id, gitId] = React.useState(true);
-
-  console.log('babyId-----------', babyId);
+  const [notificationToken, setNotificationToken] = React.useState();
+  const getfmctoken = async () => {
+    let fcmToken = await AsyncStorage.getItem('fcmToken');
+    setNotificationToken(fcmToken);
+    console.log('fcmToken from emrgency---------', fcmToken);
+  };
+  React.useEffect(() => {
+    getfmctoken();
+  }, []);
   React.useEffect(() => {
     if (!!id) {
       setBabyId(makeid(12));
       gitId(false)
     }
-  }, [imageUrl]);
+  }, []);
+  
   React.useEffect(() => {
     if (!!imageUrl) {
       updateImge();
@@ -65,6 +75,7 @@ export default function CreateBabyAccount({navigation}) {
       date: date,
       gender: gender,
       img: imageUrl,
+      id:babyId,
     };
     database()
       .ref(`/babys/${babyId}/`)
@@ -80,28 +91,45 @@ export default function CreateBabyAccount({navigation}) {
     return new Date().toJSON().slice(0, 10).replace(/-/g, '-');
   };
   const handleInfo = () => {
-
     setLoading(true);
-
-    const babyInfo = {
-      name: name,
-      date: date,
-      gender: gender,
-    };
-    database()
+    console.log("name",!!!name);
+    if(!!name) {
+      const babyInfo = {
+        name: name,
+        date: date,
+        gender: gender,
+        id:babyId,
+      };
+      database()
       .ref(`/babys/${babyId}`)
       .set({babyInfo})
       .then(() => {
         addRefBaby();
         updateUserIdBaby();
+        addNotificationToken()
         Updatebarclet();
-        uploadImage(image);
+        if(!!image){
+          uploadImage(image);
+        } else {
+          setLoading(false);
+          setIsSignUp(true);
+          setUserAuth(true);
+        }
       });
+    }else{
+      setLoading(false);
+      displayError("Invalid information","please enter Your baby name")
+    }
   };
 
   const addRefBaby = () => {
     const newReference = database().ref(`/users/${user.uid}/baby/`).push();
     newReference.set({id: `${babyId}`}).then(() => {});
+  };
+  const addNotificationToken = () => {
+    database()
+    .ref(`babys/${babyId}/users/${user.uid}/`)
+    .set({notificationToken: notificationToken});
   };
   const updateUserIdBaby = () => {
     database()

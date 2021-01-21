@@ -43,7 +43,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   function onAuthStateChanged(user) {
-    if (!!user && isSignUp) {
+    if (!!user) {
       setUser(user);
       if (initializing) setInitializing(false);
     }
@@ -109,7 +109,7 @@ export default function App() {
             screenOptions={{
               headerShown: false,
             }}>
-            {!!userAuth ? (
+            {!!userAuth && user ? (
               <>
                 <Stack.Screen name="Home" component={AppDrawer} />
                 {/* <Stack.Screen

@@ -14,17 +14,11 @@ import Card from '../components/Card';
 import LoadingIndicator from '../components/LoadingIndicator';
 
 export default function BabyAccounts({navigation}) {
-  const {babyId, user,setEditLoding, EditLoding} = React.useContext(UserContext);
+  const {babyId, user, EditLoding} = React.useContext(UserContext);
   const [loading, setLoading] = React.useState(false);
   const [Baby, setBaby] = React.useState(null);
   const [userbaby, setUserbaby] = React.useState([]);
   const [refreshing, setRefreshing] = React.useState(false);
-
-  // const onRefresh = React.useCallback(() => {
-  //   setRefreshing(true);
-
-  //   setTimeout(function(){setRefreshing(false),setEditLoding(false),setLoading(false)}, 1000);
-  // }, []);
 
   React.useEffect(() => {
     const onValueChange = database()
@@ -39,11 +33,6 @@ export default function BabyAccounts({navigation}) {
   }, []);
   var arr = [];
 
-  // console.log('bbb', Baby);
-
-  //   forEach(function(Baby) {
-  //     groupRef.child(Baby.key).once(...)
-  // })
 
   React.useEffect(() => {
     if (!!Baby) {
@@ -65,7 +54,6 @@ export default function BabyAccounts({navigation}) {
         .then(() => {
           // console.log('arr', arr);
           setUserbaby(arr);
-          // console.log('userbaby', userbaby);
         });
     }
   }, [Baby,EditLoding]);
@@ -158,6 +146,7 @@ export default function BabyAccounts({navigation}) {
   const RenderBaby = (babys) => {
     return userbaby.map((item) => {
       let parms = {item};
+      console.log()
       return (
         <TouchableOpacity
           key={item.name}

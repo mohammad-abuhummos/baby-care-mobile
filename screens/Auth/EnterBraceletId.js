@@ -12,11 +12,31 @@ import AppInput from '../../components/AppInput';
 import UserSignIn from '../../models/UserSignIn';
 import {displayError} from '../../models/helpers';
 import LoadingIndicator from '../../components/LoadingIndicator';
-import { UserContext } from '../../context/AppContext';
+import {UserContext} from '../../context/AppContext';
+import database from '@react-native-firebase/database';
 export default function EnterBraceletId({navigation}) {
   const [loading, setLoading] = React.useState(false);
   const {setBracelet} = React.useContext(UserContext);
   const [BarcletId, setBarcletId] = React.useState();
+  const bracletValidation = () => {
+    setLoading(true);
+    database()
+      .ref('bracelets')
+      .once('value')
+      .then((snapshot) => {
+        var Barclet = snapshot.child(`${BarcletId}`).exists();
+        if (Barclet) {
+          setBracelet(BarcletId);
+          setLoading(false);
+          navigation.navigate('SignUp');
+        } else {
+          displayError('Invalid Information', 'Invalid Barclet Id');
+          setLoading(false);
+        }
+      })
+      .catch((e) => console.log(e));
+  };
+
   if (loading) {
     return <LoadingIndicator />;
   } else {
@@ -32,9 +52,9 @@ export default function EnterBraceletId({navigation}) {
               source={require('../../assets/Barcletid.png')}
               style={{
                 width: 100,
-                height:70,
+                height: 70,
                 resizeMode: 'center',
-                marginBottom:-10,
+                marginBottom: -10,
               }}
             />
             <Image
@@ -59,16 +79,13 @@ export default function EnterBraceletId({navigation}) {
               />
             </View>
             <View style={{paddingTop: 30}}>
-              <AppInput label="Barclet id" onChangeText={(text) => setBarcletId(text)} />
+              <AppInput
+                label="Barclet id"
+                onChangeText={(text) => setBarcletId(text)}
+              />
             </View>
             <View style={{paddingTop: 30}}>
-              <Button
-                title="Next"
-                onPress={() => {
-                  setBracelet(BarcletId);
-                  navigation.navigate('SignUp')
-                }}
-              />
+              <Button title="Next" onPress={() => bracletValidation()} />
             </View>
           </View>
         </ScrollView>
@@ -88,7 +105,7 @@ const styles = StyleSheet.create({
     fontSize: 36,
     fontWeight: 'normal',
     padding: 10,
-    fontFamily: "Pacificos"
+    fontFamily: 'Pacificos',
   },
   InnerContainer: {
     paddingHorizontal: 50,

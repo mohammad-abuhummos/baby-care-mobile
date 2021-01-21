@@ -15,14 +15,14 @@ export default class CompleteSignUp {
     let errors_arr = [];
     if (!isName(this.firstname))
       errors_arr.push(
-        'First Name must be greater than 3 character and less than 12 character',
+        'First Name must be greater than 2 character and less than 12 character',
       );
     if (!isName(this.lastname))
       errors_arr.push(
-        'Last Name must be greater than 3 character and less than 12 character',
+        'Last Name must be greater than 2 character and less than 12 character',
       );
     if (!isPhone(this.phone))
-      errors_arr.push('Phone Number must be 10 character');
+      errors_arr.push('Phone Number must be 10 numbers');
     return errors_arr;
   }
 
