@@ -21,6 +21,7 @@ import storage from '@react-native-firebase/storage';
 import LoadingIndicator from '../components/LoadingIndicator';
 import {makeid} from '../utils/string';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {displayError} from '../models/helpers';
 export default function AddBaby({navigation}) {
   const {user} = React.useContext(UserContext);
   const [loading, setLoading] = React.useState(false);
@@ -32,7 +33,7 @@ export default function AddBaby({navigation}) {
   const [updeated, useupdated] = React.useState(false);
   // console.log('image:', image);
   console.log('imageURURl:', imageUrl);
-  const [name, setName] = React.useState('');
+  const [name, setName] = React.useState(null);
   const [date, setDate] = React.useState('2016-05-15');
   const [gender, setGender] = React.useState('Female');
   const [notificationToken, setNotificationToken] = React.useState();
@@ -41,7 +42,7 @@ export default function AddBaby({navigation}) {
     setNotificationToken(fcmToken);
   };
   React.useEffect(() => {
-    getfmctoken()
+    getfmctoken();
     if (!!id) {
       setnewId(makeid(12));
       gitId(false);
@@ -76,32 +77,39 @@ export default function AddBaby({navigation}) {
   };
   const handleInfo = () => {
     setLoading(true);
-    const babyInfo = {
-      name: name,
-      date: date,
-      gender: gender,
-      img: image,
-      id: babyId,
-    };
-    database()
-      .ref(`/babys/${babyId}`)
-      .set({babyInfo})
-      .then(() => {
-        addRefBaby();
-        addRefNotifaction();
-        if (!!image) {
-          uploadImage(image).then(() => setLoading(false)).then(() => navigation.goBack());
-        } else {
-          setLoading(false)
-           navigation.goBack()
-        }
-      });
+    if (!!name) {
+      const babyInfo = {
+        name: name,
+        date: date,
+        gender: gender,
+        img: image,
+        id: babyId,
+      };
+      database()
+        .ref(`/babys/${babyId}`)
+        .set({babyInfo})
+        .then(() => {
+          addRefBaby();
+          addRefNotifaction();
+          if (!!image) {
+            uploadImage(image)
+              .then(() => setLoading(false))
+              .then(() => navigation.goBack());
+          } else {
+            setLoading(false);
+            navigation.goBack();
+          }
+        });
+    } else {
+      setLoading(false);
+      displayError('Invalid information', 'please enter Your baby name');
+    }
   };
 
   const addRefNotifaction = () => {
     database()
-    .ref(`babys/${babyId}/users/${user.uid}/`)
-    .set({notificationToken: notificationToken});
+      .ref(`babys/${babyId}/users/${user.uid}/`)
+      .set({notificationToken: notificationToken});
   };
   const addRefBaby = () => {
     const newReference = database().ref(`/users/${user.uid}/baby/`).push();
