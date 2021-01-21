@@ -38,7 +38,7 @@ export default function Statistics({navigation}) {
         if (index === 0) {
           return date;
         } else {
-          return (date / 1000 - 900 * index) * 1000;
+          return ((date / 1000 *index) - 900 * index) * 100;
         }
       });
     } 
@@ -48,7 +48,7 @@ export default function Statistics({navigation}) {
         if (index === 0) {
           return date;
         } else {
-          return ((date / 1000) - (3600 * index)) * 1000;
+          return ((date / 1000*index) - (3600 * index)) * 100;
         }
       });
     } 
@@ -211,7 +211,7 @@ export default function Statistics({navigation}) {
     try {
       // console.log("end",end)
       const scores = await database()
-        .ref(`babys/0finyumOYxgW/logs/${Sign}`)
+        .ref(`babys/${babyId}/logs/${Sign}`)
         .orderByKey()
         .startAt(`${end}`)
         .endAt(`${start}`)
