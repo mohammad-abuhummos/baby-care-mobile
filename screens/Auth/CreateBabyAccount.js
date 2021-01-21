@@ -21,6 +21,7 @@ import storage from '@react-native-firebase/storage';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import { makeid } from '../../utils/string';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { displayError } from '../../models/helpers';
 
 export default function CreateBabyAccount({navigation}) {
   const {
@@ -34,7 +35,7 @@ export default function CreateBabyAccount({navigation}) {
   const [loading, setLoading] = React.useState(false);
   const [uploading, setUploading] = React.useState(false);
   const [image, setImage] = React.useState(null); 
-  const [name, setName] = React.useState('');
+  const [name, setName] = React.useState(null);
   const [date, setDate] = React.useState('2016-05-15');
   const [gender, setGender] = React.useState('Female');
   const [imageUrl, setImageUrl] = React.useState(null);
@@ -90,16 +91,16 @@ export default function CreateBabyAccount({navigation}) {
     return new Date().toJSON().slice(0, 10).replace(/-/g, '-');
   };
   const handleInfo = () => {
-
     setLoading(true);
-
-    const babyInfo = {
-      name: name,
-      date: date,
-      gender: gender,
-      id:babyId,
-    };
-    database()
+    console.log("name",!!!name);
+    if(!!name) {
+      const babyInfo = {
+        name: name,
+        date: date,
+        gender: gender,
+        id:babyId,
+      };
+      database()
       .ref(`/babys/${babyId}`)
       .set({babyInfo})
       .then(() => {
@@ -107,8 +108,18 @@ export default function CreateBabyAccount({navigation}) {
         updateUserIdBaby();
         addNotificationToken()
         Updatebarclet();
-        uploadImage(image);
+        if(!!image){
+          uploadImage(image);
+        } else {
+          setLoading(false);
+          setIsSignUp(true);
+          setUserAuth(true);
+        }
       });
+    }else{
+      setLoading(false);
+      displayError("Invalid information","please enter Your baby name")
+    }
   };
 
   const addRefBaby = () => {
